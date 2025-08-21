@@ -23,8 +23,15 @@ public class Main {
        // Wait for connection from client.
        System.out.println("accepted new connection");
          BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+         String line = in.readLine();
          PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
-         out.println("HTTP/1.1 200 OK\r\n\r\n");
+
+         if(!line.isEmpty()&&line.split(" ")[1].equals("/")){
+            out.println("HTTP/1.1 200 OK\r\n\r\n");
+        }
+         else {
+             out.println("HTTP/1.1 404 NOT_FOUND\r\n\r\n");
+         }
      } catch (IOException e) {
        System.out.println("IOException: " + e.getMessage());
      }
