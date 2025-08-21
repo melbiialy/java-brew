@@ -27,10 +27,10 @@ public class Main {
          PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
 
          if(!line.isEmpty()&&line.split(" ")[1].equals("/")){
-            out.println("HTTP/1.1 200 OK\r\n\r\n");
+            out.println("HTTP/1.1 200 OK");
         }
          else {
-             out.println("HTTP/1.1 404 NOT_FOUND\r\n\r\n");
+             out.println("HTTP/1.1 404 NOT_FOUND");
          }
      } catch (IOException e) {
        System.out.println("IOException: " + e.getMessage());
