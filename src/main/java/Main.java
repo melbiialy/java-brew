@@ -28,13 +28,8 @@ public class Main {
                   String line = in.readLine();
                   PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-                  String response;
-                  if (!line.isEmpty() && line.split(" ")[1].equals("/")) {
-                      response = "HTTP/1.1 200 OK\r\n\r\n";
-                  } else {
-                      response = "HTTP/1.1 404 Not Found\r\n\r\n";
+                  String response ="HTTP/1.1 200 OK\\r\\n\\r\\n\n";
 
-                  }
                   out.println(response);
                   out.flush();
                   System.out.println("responseString: " + response);
