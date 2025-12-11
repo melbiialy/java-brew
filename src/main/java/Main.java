@@ -42,11 +42,8 @@ public class Main {
                   String endpointPath = path.split("/")[1];
                   if (endpointPath.equals("user-agent")){
                       System.out.println(in.readLine());
-                      System.out.println(in.readLine());
+
                       String userAgent = in.readLine();
-                      if (userAgent == null) {
-                          continue;
-                      }
                       userAgent = userAgent.substring("User-Agent: ".length());
                       response = String.format("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", userAgent.length(), userAgent);
                   }
