@@ -25,10 +25,15 @@ public class Main {
                   // Wait for connection from client.
                   System.out.println("accepted new connection");
                   BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                  String line = in.readLine();
                   PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                  String request = in.readLine();
+                  String path = request.split(" ")[1];
+                  String response;
+                  if(path.equals("/")) {
+                      response = "HTTP/1.1 200 OK\r\n\r\n";
+                  }
+                  else response = "HTTP/1.1 404 Not Found\r\n\r\n";
 
-                  String response ="HTTP/1.1 200 OK\r\n\r\n";
 
                   out.println(response);
                   out.flush();
