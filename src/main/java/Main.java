@@ -33,6 +33,9 @@ public class Main {
                   String response;
                   if (path.equals(" ")){
                       response = "HTTP/1.1 200 OK\r\n\r\n";
+                      out.println(response);
+                      out.flush();
+                      continue;
                   }
                   String endpointPath = path.split("/")[1];
                   if (Objects.equals(endpointPath, "echo")) {
