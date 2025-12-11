@@ -29,10 +29,10 @@ public class Main {
                   String request = in.readLine();
                   String path = request.split(" ")[1];
                   String response;
-                  if(path.equals("/")) {
-                      response = "HTTP/1.1 200 OK\r\n\r\n";
-                  }
-                  else response = "HTTP/1.1 404 Not Found\r\n\r\n";
+                  String endpoint = path.split("/")[2];
+                  System.out.println("endpoint: " + endpoint);
+                  response = String.format("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", endpoint.length(), endpoint);
+
 
 
                   out.println(response);
