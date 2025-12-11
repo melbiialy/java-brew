@@ -29,6 +29,7 @@ public class Main {
                   PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                   String request = in.readLine();
                   String path = request.split(" ")[1];
+                  System.out.println(request);
 
                   String response;
                   if (path.equals("/")) {
@@ -37,14 +38,23 @@ public class Main {
                       out.flush();
                       continue;
                   }
+
                   String endpointPath = path.split("/")[1];
+                  if (endpointPath.equals("user-agent")){
+                      System.out.println(in.readLine());
+                      System.out.println(in.readLine());
+                      String userAgent = in.readLine();
+                      userAgent = userAgent.substring("User-Agent: ".length());
+                      response = String.format("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", userAgent.length(), userAgent);
+                  }
+                  else
                   if (Objects.equals(endpointPath, "echo")) {
 
                       String endpoint = path.split("/")[2];
                       System.out.println("endpoint: " + endpoint);
                       response = String.format("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", endpoint.length(), endpoint);
 
-                  } else {
+                  }  else {
                       response = "HTTP/1.1 404 Not Found\r\n\r\n";
                   }
 
