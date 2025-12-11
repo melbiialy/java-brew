@@ -29,11 +29,12 @@ public class Main {
                   PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                   String request = in.readLine();
                   String path = request.split(" ")[1];
-                  String endpointPath = path.split("/")[1];
+
                   String response;
                   if (path.equals(" ")){
                       response = "HTTP/1.1 200 OK\r\n\r\n";
                   }
+                  String endpointPath = path.split("/")[1];
                   if (Objects.equals(endpointPath, "echo")) {
 
                       String endpoint = path.split("/")[2];
