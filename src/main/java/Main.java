@@ -4,6 +4,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Objects;
 
 public class Main {
   public static void main(String[] args) {
@@ -28,12 +29,20 @@ public class Main {
                   PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                   String request = in.readLine();
                   String path = request.split(" ")[1];
+                  String endpointPath = path.split("/")[1];
                   String response;
-                  String endpoint = path.split("/")[2];
-                  System.out.println("endpoint: " + endpoint);
-                  response = String.format("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", endpoint.length(), endpoint);
+                  if (path.equals(" ")){
+                      response = "HTTP/1.1 200 OK\r\n\r\n";
+                  }
+                  if (Objects.equals(endpointPath, "echo")) {
 
+                      String endpoint = path.split("/")[2];
+                      System.out.println("endpoint: " + endpoint);
+                      response = String.format("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", endpoint.length(), endpoint);
 
+                  } else {
+                      response = "HTTP/1.1 404 Not Found\r\n\r\n";
+                  }
 
                   out.println(response);
                   out.flush();
