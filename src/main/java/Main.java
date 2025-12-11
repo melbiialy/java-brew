@@ -28,7 +28,7 @@ public class Main {
                   String line = in.readLine();
                   PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-                  String response ="HTTP/1.1 200 OK\\r\\n\\r\\n\n";
+                  String response ="HTTP/1.1 200 OK\r\n\r\n";
 
                   out.println(response);
                   out.flush();
