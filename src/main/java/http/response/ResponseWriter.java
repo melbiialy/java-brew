@@ -18,12 +18,12 @@ public class ResponseWriter {
              response.getHeaders().forEach((key, value) -> headersStr.append(key).append(": ").append(value).append("\r\n"));
          }
         String body = response.getBody();
-        out.println(statusLineStr);
+        out.print(statusLineStr);
         if (!headersStr.isEmpty()) {
-            out.println(headersStr);
+            out.print(headersStr);
         }
         if (body != null) {
-            out.println(body);
+            out.print(body);
         }
         out.flush();
     }
