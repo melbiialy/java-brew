@@ -8,7 +8,7 @@ protocol that powers the web. In this challenge, you'll build a HTTP/1.1 server
 that is capable of serving multiple clients.
 
 Along the way you'll learn about TCP servers,
-[HTTP request syntax](https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html),
+[HTTP HTTPRequest syntax](https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html),
 and more.
 
 **Note**: If you're viewing this repo on GitHub, head over to
