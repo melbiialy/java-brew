@@ -16,7 +16,7 @@ public class ResponseWriter {
         out.println(statusLineStr);
         response.getHeaders().forEach((key, value) -> out.println(key + ": " + value));
         out.print("\r\n");
-        out.println(statusLineStr);
+        out.println("HTTP/1.1 200 OK\r\n\r\n");
 
         out.flush();
     }
