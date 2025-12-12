@@ -1,8 +1,5 @@
-import endpoints.Echo;
-import endpoints.FileEndPoint;
+import endpoints.*;
 
-import endpoints.HelloWorld;
-import endpoints.Home;
 import http.request.HTTPRequest;
 import http.response.HTTPResponse;
 import http.routing.Route;
@@ -110,6 +107,8 @@ public class Main {
         router.addEndPoint("/echo/{msg}",echoRoute);
         Route<FileEndPoint> route = new Route<>(FileEndPoint.class, FileEndPoint.class.getDeclaredMethod("files", HTTPRequest.class, HTTPResponse.class,List.class),"GET");
         router.addEndPoint("/files/{path}",route);
+        Route<UserAgent> userAgentRoute = new Route<>(UserAgent.class, UserAgent.class.getDeclaredMethod("userAgent", HTTPRequest.class, HTTPResponse.class,List.class),"GET");
+        router.addEndPoint("/user-agent",userAgentRoute);
         server.start();
 
 
