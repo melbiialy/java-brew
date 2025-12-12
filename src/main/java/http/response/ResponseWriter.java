@@ -13,19 +13,20 @@ public class ResponseWriter {
                                         statusLine.getHttpVersion(),
                                         statusLine.getStatusCode(),
                                         statusLine.getStatusMessage());
+        StringBuilder httpResponse = new StringBuilder();
         StringBuilder headersStr = new StringBuilder();
         if (response.getHeaders() != null) {
              response.getHeaders().forEach((key, value) -> headersStr.append(key).append(": ").append(value).append("\r\n"));
          }
         String body = response.getBody();
-        out.print(statusLineStr);
+        httpResponse.append(statusLineStr);
         if (!headersStr.isEmpty()) {
-            out.print(headersStr);
+            httpResponse.append(headersStr);
         }
         if (body != null) {
-            out.print(body+"\r\n");
+            httpResponse.append("\r\n").append(body);
         }
-        out.print("\r\n");
+        out.print(httpResponse.toString());
         out.flush();
     }
 }
