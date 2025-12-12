@@ -70,7 +70,7 @@ public class HTTPServer {
         }catch (ResourceNotFoundException ex){
             HTTPResponseBuilder responseBuilder = new HTTPResponseBuilder();
             HTTPResponse response = responseBuilder.withStatusLine(new http.response.StatusLine("HTTP/1.1", 404, "Not Found"))
-                    .withBody("").build();
+                    .build();
             ResponseWriter.writeResponse(response, socket);
         }
     }
