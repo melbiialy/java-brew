@@ -22,12 +22,12 @@ public class ResponseWriter {
         httpResponse.append(statusLineStr);
         if (!headersStr.isEmpty()) {
             httpResponse.append(headersStr);
-            httpResponse.append("\r\n");
         }
         if (body != null) {
             httpResponse.append("\r\n").append(body);
         }
 
+        httpResponse.append("\r\n");
         out.print(httpResponse.toString());
         out.flush();
     }
