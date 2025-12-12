@@ -23,7 +23,7 @@ public class ResponseWriter {
             out.print(headersStr);
         }
         if (body != null) {
-            out.print(body);
+            out.print(body+"\r\n\r\n");
         }
         out.flush();
     }
