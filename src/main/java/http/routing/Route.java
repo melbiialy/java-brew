@@ -1,12 +1,14 @@
 package http.routing;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 public class Route<T> {
     private Class<T> controller;
     private Method method;
     private String httpMethod;
-    public Route(Class<T> controller, Method method, String httpMethod) {
+    private List<String> pathParams;
+    public Route(Class<T> controller, Method method,String httpMethod) {
         this.controller = controller;
         this.method = method;
         this.httpMethod = httpMethod;
