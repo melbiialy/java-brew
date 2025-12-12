@@ -10,7 +10,13 @@ import http.response.HTTPResponseBuilder;
 import http.response.ResponseWriter;
 import http.response.StatusLine;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Objects;
 
 public class Main {
   public static void main(String[] args) throws Exception {
@@ -21,11 +27,11 @@ public class Main {
     //
 //      while (true) {
 //          try(
-//         HTTPServerSocket serverSocket = new HTTPServerSocket(4221);) {
-//
-//
-//              // Since the tester restarts your program quite often, setting SO_REUSEADDR
-//              // ensures that we don't run into 'Address already in use' errors
+//                  ServerSocket serverSocket = new ServerSocket(4221);) {
+
+
+              // Since the tester restarts your program quite often, setting SO_REUSEADDR
+              // ensures that we don't run into 'Address already in use' errors
 //              serverSocket.setReuseAddress(true);
 //
 //              try( Socket socket = serverSocket.accept()) {
@@ -74,21 +80,8 @@ public class Main {
 //              System.out.println("IOException: " + e.getMessage());
 //          }
 //      }
-//      HTTPServerSocket serverSocket = new HTTPServerSocket(4221);
-//      RequestReader requestReader = new RequestReader();
-//      while (true){
-//          try (Socket socket = serverSocket.accept()){
-//              HTTPRequest HTTPRequest = requestReader.readRequest(socket);
-//              HTTPResponse httpResponse = new HTTPResponseBuilder()
-//                      .withBody("hello from me")
-//                              .withHeader("Content-Type:","test/plain")
-//                                      .withStatusLine(new StatusLine("HTTP/1.1",200,"OK"))
-//                                              .build();
-//              ResponseWriter.writeResponse(httpResponse, socket);
-//
-//          }
-//
-//      }
+
+
       HTTPServer server = new HTTPServer(4221);
       Route<HelloWorld> route = new Route<>(HelloWorld.class,HelloWorld.class.getMethod("sayHello"),"GET");
       Router router = server.getRouter();

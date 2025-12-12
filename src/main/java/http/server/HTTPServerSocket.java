@@ -3,7 +3,7 @@ package http.server;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class HTTPServerSocket {
+public class HTTPServerSocket implements AutoCloseable {
     private ServerSocket serverSocket;
     private int port;
     private String host;
@@ -12,11 +12,15 @@ public class HTTPServerSocket {
         System.out.println("Starting server on port " + port);
         this.port = port;
         this.serverSocket = new ServerSocket(port);
+        serverSocket.setReuseAddress(true);
     }
     public Socket accept() throws Exception {
         return serverSocket.accept();
     }
 
 
+    @Override
+    public void close() throws Exception {
 
+    }
 }
