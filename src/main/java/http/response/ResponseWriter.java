@@ -9,7 +9,7 @@ public class ResponseWriter {
     public static void writeResponse(HTTPResponse response, Socket socket) throws IOException {
         PrintWriter out = new PrintWriter(socket.getOutputStream());
         StatusLine statusLine = response.getStatusLine();
-        String statusLineStr = String.format("%s %d %s\r\n",
+        String statusLineStr = String.format("%s %d %s\r\n\r\n",
                                         statusLine.getHttpVersion(),
                                         statusLine.getStatusCode(),
                                         statusLine.getStatusMessage());
