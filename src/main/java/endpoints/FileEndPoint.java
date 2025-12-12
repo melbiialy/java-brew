@@ -29,7 +29,7 @@ public class FileEndPoint{
     }
     public void postFile(HTTPRequest request, HTTPResponse response, List<String> pathVariables) throws IOException {
         String filename = pathVariables.getFirst();
-        File file = new File("/tmp/" + filename);
+        File file = new File("/tmp/data/codecrafters.io/http-server-tester/" + filename);
         Files.writeString(file.toPath(), request.getBody());
         response.getStatusLine().setStatusCode(201);
         response.getStatusLine().setStatusMessage("Created");
