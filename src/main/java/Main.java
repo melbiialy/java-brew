@@ -42,12 +42,6 @@ public class Main {
                           extracted(socket);
                       } catch (IOException e) {
                           throw new RuntimeException(e);
-                      }finally {
-                            try {
-                                socket.close();
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
                       }
                   })).start();
               } catch (IOException e) {
