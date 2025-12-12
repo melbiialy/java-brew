@@ -58,6 +58,7 @@ public class HTTPServer {
 
     private void process(HTTPRequest httpRequest, Socket socket) throws IOException {
         try {
+            System.out.println(httpRequest);
             Object responseBody = router.route(httpRequest);
             HTTPResponseBuilder responseBuilder = new HTTPResponseBuilder();
             HTTPResponse response = responseBuilder.withBody(responseBody.toString())
