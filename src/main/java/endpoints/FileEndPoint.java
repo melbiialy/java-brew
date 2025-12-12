@@ -27,4 +27,12 @@ public class FileEndPoint{
         }
 //        System.out.println(Files.readString(file.toPath()));
     }
+    public void postFile(HTTPRequest request, HTTPResponse response, List<String> pathVariables) throws IOException {
+        String filename = pathVariables.getFirst();
+        File file = new File("/tmp/" + filename);
+        Files.writeString(file.toPath(), request.getBody());
+        response.getStatusLine().setStatusCode(201);
+        response.getStatusLine().setStatusMessage("Created");
+        System.out.println("File created");
+    }
 }

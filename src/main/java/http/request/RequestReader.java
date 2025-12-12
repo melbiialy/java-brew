@@ -18,11 +18,16 @@ public class RequestReader {
             HashMap<String, String> headers = parseHeaders(reader);
             System.out.println(headers);
 
-            String body = null;
-            if (reader.ready()){
-                body = reader.readLine();
-                System.out.println("Body: " + body);
-            }
+        String contentLengthHeader = headers.get("Content-Length");
+        String body = null;
+
+        if (contentLengthHeader != null) {
+            int length = Integer.parseInt(contentLengthHeader);
+            char[] buffer = new char[length];
+            reader.read(buffer, 0, length);
+            body = new String(buffer);
+        }
+
             return new HTTPRequest(requestLine, headers, body);
 
 

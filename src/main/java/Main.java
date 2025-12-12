@@ -109,6 +109,8 @@ public class Main {
         router.addEndPoint("/files/{path}",route);
         Route<UserAgent> userAgentRoute = new Route<>(UserAgent.class, UserAgent.class.getDeclaredMethod("userAgent", HTTPRequest.class, HTTPResponse.class,List.class),"GET");
         router.addEndPoint("/user-agent",userAgentRoute);
+        Route<FileEndPoint> postFileRoute = new Route<>(FileEndPoint.class, FileEndPoint.class.getDeclaredMethod("postFile", HTTPRequest.class, HTTPResponse.class,List.class),"POST");
+        router.addEndPoint("/files/{filename}",postFileRoute);
         server.start();
 
 
