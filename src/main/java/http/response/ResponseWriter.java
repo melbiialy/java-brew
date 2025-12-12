@@ -16,9 +16,8 @@ public class ResponseWriter {
         out.println(statusLineStr);
         response.getHeaders().forEach((key, value) -> out.println(key + ": " + value));
         out.print("\r\n");
-        if (response.getBody() != null) {
-            out.println(response.getBody());
-        }
+        out.println(statusLineStr);
+
         out.flush();
     }
 }
