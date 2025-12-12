@@ -12,7 +12,7 @@ import java.util.List;
 public class FileEndPoint{
     public void files(HTTPRequest request, HTTPResponse response, List<String> pathVariables) throws IOException {
         String filename = pathVariables.getFirst();
-        File file = new File("/home/bialy/codecrafters-http-server-java/src/temp/" + filename);
+        File file = new File("/tmp/data/codecrafters.io/http-server-tester/" + filename);
 
         if (file.exists()) {
             response.setBody(Files.readString(file.toPath()));
