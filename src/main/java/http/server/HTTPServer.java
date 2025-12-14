@@ -49,8 +49,9 @@ public class HTTPServer {
         HTTPResponse response = new HTTPResponse();
         if (httpRequest.getHeaders() != null) {
             String encoding = httpRequest.getHeaders().get("Accept-Encoding");
-            if (encoding !=null && encoding.contains("gzip")){
-                response.getHeaders().put("Content-Encoding",encoding);
+//            String[] acceptEncoding = encoding.split(",");
+            if (encoding!=null&&encoding.contains("gzip")){
+                response.getHeaders().put("Content-Encoding","gzip");
             }
         }
         response.setStatusLine(new StatusLine("HTTP/1.1", 0, ""));
