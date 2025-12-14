@@ -17,6 +17,7 @@ public class ResponseWriter {
         StatusLine statusLine = response.getStatusLine();
         String statusLineString = statusLine.getHttpVersion() + " " + statusLine.getStatusCode() + " " + statusLine.getStatusMessage() + "\r\n";
         out.write(statusLineString.getBytes());
+        out.write("\r\n".getBytes());
         String encoding = response.getHeaders().get("Content-Encoding");
         response.getHeaders().forEach(
                 (key, value) -> {
