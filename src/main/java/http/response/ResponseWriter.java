@@ -42,11 +42,11 @@ public class ResponseWriter {
         if (body != null) {
 
             if (encoding!=null&&encoding.contains("gzip")){
-                httpResponse.append("Content-Length:").append(encodedBody.length).append("\r\n");
+                httpResponse.append(String.format("Content-Length: %d",encodedBody.length)).append("\r\n");
                 httpResponse.append(Arrays.toString(encodedBody));
             }
             else {
-                httpResponse.append("Content-Length:").append(body.length()).append("\r\n");
+                httpResponse.append(String.format("Content-Length: %d",body.length())).append("\r\n");
                 httpResponse.append(body);
 
             }
