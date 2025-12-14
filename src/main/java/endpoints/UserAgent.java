@@ -11,7 +11,6 @@ public class UserAgent {
         response.getStatusLine().setStatusCode(200);
         response.getStatusLine().setStatusMessage("OK");
         response.getHeaders().put("Content-Type", "text/plain");
-        response.getHeaders().put("Content-Length", String.valueOf(request.getHeaders().get("User-Agent").length()));
 
     }
 }

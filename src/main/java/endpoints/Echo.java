@@ -11,6 +11,5 @@ public class Echo {
         response.getStatusLine().setStatusCode(200);
         response.getStatusLine().setStatusMessage("OK");
         response.getHeaders().put("Content-Type", "text/plain");
-        response.getHeaders().put("Content-Length", String.valueOf(pathVariables.getFirst().length()));
     }
 }

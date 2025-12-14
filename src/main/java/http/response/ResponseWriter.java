@@ -40,10 +40,15 @@ public class ResponseWriter {
             httpResponse.append(headersStr);
         }
         if (body != null) {
-            httpResponse.append("\r\n");
-            if (encoding!=null&&encoding.contains("gzip")){httpResponse.append(Arrays.toString(encodedBody));}
+
+            if (encoding!=null&&encoding.contains("gzip")){
+                httpResponse.append("Content-Length:").append(encodedBody.length).append("\r\n");
+                httpResponse.append(Arrays.toString(encodedBody));
+            }
             else {
+                httpResponse.append("Content-Length:").append(body.length()).append("\r\n");
                 httpResponse.append(body);
+
             }
         }
 

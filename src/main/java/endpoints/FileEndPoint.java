@@ -19,7 +19,6 @@ public class FileEndPoint{
             response.getStatusLine().setStatusCode(200);
             response.getStatusLine().setStatusMessage("OK");
             response.getHeaders().put("Content-Type", "application/octet-stream");
-            response.getHeaders().put("Content-Length", String.valueOf(file.length()));
         }
         else {
             response.getStatusLine().setStatusCode(404);
