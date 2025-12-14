@@ -2,6 +2,7 @@ package http.response;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -11,7 +12,7 @@ import java.util.zip.GZIPOutputStream;
 public class ResponseWriter {
 
     public  void writeResponse(HTTPResponse response, Socket socket) throws IOException {
-        PrintWriter out = new PrintWriter(socket.getOutputStream());
+        OutputStream out = socket.getOutputStream();
         StatusLine statusLine = response.getStatusLine();
         String statusLineStr = String.format("%s %d %s\r\n",
                                         statusLine.getHttpVersion(),
@@ -42,18 +43,22 @@ public class ResponseWriter {
         if (body != null) {
 
             if (encoding!=null&&encoding.contains("gzip")){
-                httpResponse.append(String.format("Content-Length: %d",encodedBody.length)).append("\r\n");
-                httpResponse.append(Arrays.toString(encodedBody));
+                httpResponse.append("Content-Length: "+encodedBody.length+"\r\n");
+                httpResponse.append("\r\n");
             }
             else {
-                httpResponse.append(String.format("Content-Length: %d",body.length())).append("\r\n");
+                httpResponse.append("Content-Length: " + body.length() + "\r\n");
+                httpResponse.append("\r\n");
                 httpResponse.append(body);
 
             }
         }
 
         httpResponse.append("\r\n");
-        out.print(httpResponse.toString());
+        out.write(httpResponse.toString().getBytes());
+        if (encodedBody!=null) {
+            out.write(encodedBody);
+        }
         out.flush();
     }
 }
