@@ -19,16 +19,7 @@ public class ResponseWriter {
         out.write(statusLineString.getBytes());
         out.write("\r\n".getBytes());
         String encoding = response.getHeaders().get("Content-Encoding");
-        response.getHeaders().forEach(
-                (key, value) -> {
-                    try {
-                        String headerLine = key + ": " + value + "\r\n";
-                        out.write(headerLine.getBytes());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-        );
+
         byte[] encodedBody = null;
         if (encoding != null && encoding.equals("gzip")) {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -40,7 +31,23 @@ public class ResponseWriter {
         } else {
             encodedBody = response.getBody().getBytes();
         }
-        out.write(String.format("Content-Length: %d\r\n\r\n", encodedBody.length).getBytes());
+        final int contentLength = encodedBody.length;
+        response.getHeaders().forEach(
+                (key, value) -> {
+                    try {
+                        if (key.equalsIgnoreCase("Content-Length")) {
+                            String contentLengthLine = key + ": " + contentLength+ "\r\n";
+                            out.write(contentLengthLine.getBytes());
+                        }
+                        else {
+                            String headerLine = key + ": " + value + "\r\n";
+                            out.write(headerLine.getBytes());
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+        );
         out.write(encodedBody);
         out.flush();
 
