@@ -1,8 +1,12 @@
 package http.response;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.zip.GZIPOutputStream;
 
 public class ResponseWriter {
 
@@ -18,13 +22,29 @@ public class ResponseWriter {
         if (response.getHeaders() != null) {
              response.getHeaders().forEach((key, value) -> headersStr.append(key).append(": ").append(value).append("\r\n"));
          }
+        String encoding = response.getHeaders().get("Content-Encoding");
         String body = response.getBody();
+        byte[] encodedBody = null;
+        if (encoding!=null&&encoding.contains("gzip")){
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            try(GZIPOutputStream gzip = new GZIPOutputStream(bos)) {
+                gzip.write(body.getBytes(StandardCharsets.UTF_8));
+                gzip.finish();
+                encodedBody = bos.toByteArray();
+            }
+
+        }
+
         httpResponse.append(statusLineStr);
         if (!headersStr.isEmpty()) {
             httpResponse.append(headersStr);
         }
         if (body != null) {
-            httpResponse.append("\r\n").append(body);
+            httpResponse.append("\r\n");
+            if (encoding!=null&&encoding.contains("gzip")){httpResponse.append(Arrays.toString(encodedBody));}
+            else {
+                httpResponse.append(body);
+            }
         }
 
         httpResponse.append("\r\n");
