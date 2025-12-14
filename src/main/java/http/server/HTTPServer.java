@@ -29,11 +29,18 @@ public class HTTPServer {
         System.out.println("Press CTRL+C to stop the server");
         while (this.running){
             Socket socket = serverSocket.accept();
+            socket.setTcpNoDelay(true);
+            socket.setSoTimeout(0);
+            socket.setKeepAlive(true);
             System.out.println("accepted new connection");
             Thread thread = new Thread(()-> {
                 try {
-                    HTTPRequest httpRequest = requestReader.readRequest(socket);
-                    process(httpRequest,socket);
+
+                    HTTPRequest httpRequest ;
+                    while ((httpRequest = requestReader.readRequest(socket))!=null) {
+
+                        process(httpRequest, socket);
+                    }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

@@ -6,6 +6,7 @@ public class HTTPResponse {
     private StatusLine statusLine;
     private HashMap<String, String> headers;
     private String body;
+
     public HTTPResponse() {
         headers = new HashMap<>();
     }

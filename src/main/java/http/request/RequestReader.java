@@ -10,13 +10,14 @@ public class RequestReader {
 
     public HTTPRequest readRequest(Socket socket) throws IOException {
 
-            System.out.println("accepted new connection");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            RequestLine requestLine = new RequestLine();
-            parseRequestLine(reader, requestLine);
-            System.out.println(requestLine);
-            HashMap<String, String> headers = parseHeaders(reader);
-            System.out.println(headers);
+
+        System.out.println("accepted new connection");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        RequestLine requestLine = new RequestLine();
+        parseRequestLine(reader, requestLine);
+        System.out.println(requestLine);
+        HashMap<String, String> headers = parseHeaders(reader);
+        System.out.println(headers);
 
         String contentLengthHeader = headers.get("Content-Length");
         String body = readRequestBody(contentLengthHeader, reader);
