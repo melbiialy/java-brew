@@ -20,14 +20,18 @@ public class ResponseWriter {
         String encoding = response.getHeaders().get("Content-Encoding");
         byte[] encodedBody;
 
-        if (encoding != null && encoding.equals("gzip")) {
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            try (GZIPOutputStream gzip = new GZIPOutputStream(buffer)) {
-                gzip.write(response.getBody().getBytes(StandardCharsets.UTF_8));
+        if (response.getBody() != null && !response.getBody().isEmpty()) {
+            if (encoding != null && encoding.equals("gzip")) {
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                try (GZIPOutputStream gzip = new GZIPOutputStream(buffer)) {
+                    gzip.write(response.getBody().getBytes(StandardCharsets.UTF_8));
+                }
+                encodedBody = buffer.toByteArray();
+            } else {
+                encodedBody = response.getBody().getBytes(StandardCharsets.UTF_8);
             }
-            encodedBody = buffer.toByteArray();
         } else {
-            encodedBody = response.getBody().getBytes(StandardCharsets.UTF_8);
+            encodedBody = new byte[0];
         }
 
         String statusLineString = statusLine.getHttpVersion() + " " +
