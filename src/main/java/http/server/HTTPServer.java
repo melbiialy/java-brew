@@ -47,6 +47,12 @@ public class HTTPServer {
 
     private void process(HTTPRequest httpRequest, Socket socket) throws IOException {
         HTTPResponse response = new HTTPResponse();
+        if (httpRequest.getHeaders() != null) {
+            String encoding = httpRequest.getHeaders().get("Accept-Encoding");
+            if (encoding !=null && encoding.contains("gzip")){
+                response.getHeaders().put("Content-Encoding",encoding);
+            }
+        }
         response.setStatusLine(new StatusLine("HTTP/1.1", 0, ""));
         router.route(httpRequest,response);
         this.responseWriter.writeResponse(response, socket);

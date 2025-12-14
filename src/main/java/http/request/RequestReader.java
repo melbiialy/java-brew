@@ -19,19 +19,25 @@ public class RequestReader {
             System.out.println(headers);
 
         String contentLengthHeader = headers.get("Content-Length");
-        String body = null;
+        String body = readRequestBody(contentLengthHeader, reader);
+        return new HTTPRequest(requestLine, headers, body);
 
-        if (contentLengthHeader != null) {
-            int length = Integer.parseInt(contentLengthHeader);
-            char[] buffer = new char[length];
-            reader.read(buffer, 0, length);
+
+    }
+
+    private static String readRequestBody(String contentLengthHeader, BufferedReader reader) throws IOException {
+        String body = null;
+        if(contentLengthHeader != null) {
+            int contentLength = Integer.parseInt(contentLengthHeader);
+            int totalRead = 0;
+            char[] buffer = new char[contentLength];
+            while(totalRead < contentLength) {
+                int read = reader.read(buffer, totalRead, contentLength - totalRead);
+                totalRead += read;
+            }
             body = new String(buffer);
         }
-
-            return new HTTPRequest(requestLine, headers, body);
-
-
-
+        return body;
     }
 
     private static HashMap<String, String> parseHeaders(BufferedReader reader) throws IOException {
