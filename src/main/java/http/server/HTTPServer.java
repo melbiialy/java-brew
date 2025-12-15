@@ -38,7 +38,10 @@ public class HTTPServer {
 
                     HTTPRequest httpRequest ;
                     while ((httpRequest = requestReader.readRequest(socket))!=null) {
-                        boolean closeConnection = httpRequest.getHeaders().get("Connection").equals("close");
+                        boolean closeConnection = false;
+                        if (httpRequest.getHeaders().containsKey("Connection")&&httpRequest.getHeaders().get("Connection").equals("close")){
+                            closeConnection = true;
+                        }
 
                         process(httpRequest, socket);
                         if (closeConnection) {
