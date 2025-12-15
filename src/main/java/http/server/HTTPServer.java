@@ -63,9 +63,13 @@ public class HTTPServer {
         HTTPResponse response = new HTTPResponse();
         if (httpRequest.getHeaders() != null) {
             String encoding = httpRequest.getHeaders().get("Accept-Encoding");
+            String connection = httpRequest.getHeaders().get("Connection");
 //            String[] acceptEncoding = encoding.split(",");
             if (encoding!=null&&encoding.contains("gzip")){
                 response.getHeaders().put("Content-Encoding","gzip");
+            }
+            if (connection!=null&&connection.contains("close")){
+                response.getHeaders().put("Connection","close");
             }
         }
         response.setStatusLine(new StatusLine("HTTP/1.1", 0, ""));
