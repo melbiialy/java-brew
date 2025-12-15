@@ -38,8 +38,12 @@ public class HTTPServer {
 
                     HTTPRequest httpRequest ;
                     while ((httpRequest = requestReader.readRequest(socket))!=null) {
+                        boolean closeConnection = httpRequest.getHeaders().get("Connection").equals("close");
 
                         process(httpRequest, socket);
+                        if (closeConnection) {
+                            socket.close();
+                        }
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
