@@ -7,17 +7,18 @@ import http.response.StatusLine;
 import http.routing.Router;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.Socket;
 
 public class HTTPServer {
-    private HTTPServerSocket serverSocket;
+    private ServerSocket serverSocket;
     private RequestReader requestReader;
     private ResponseWriter responseWriter;
     private boolean running;
     private Router router;
 
     public HTTPServer(int port) throws Exception {
-        serverSocket = new HTTPServerSocket(port);
+        serverSocket = new ServerSocket(port);
         requestReader = new RequestReader();
         responseWriter = new ResponseWriter();
         router = new Router();
@@ -78,11 +79,11 @@ public class HTTPServer {
         System.out.println("Response sent to client");
     }
 
-    public HTTPServerSocket getServerSocket() {
+    public ServerSocket getServerSocket() {
         return serverSocket;
     }
 
-    public void setServerSocket(HTTPServerSocket serverSocket) {
+    public void setServerSocket(ServerSocket serverSocket) {
         this.serverSocket = serverSocket;
     }
 
