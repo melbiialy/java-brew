@@ -26,30 +26,32 @@ public class EndPointRegistry {
                 Method[] methods = clazz.getMethods();
                 // todo handle to call the application context to get the controller object
                 Object controllerInstance = clazz.getDeclaredConstructor().newInstance();
-                for (Method method : methods){
-                    if (method.isAnnotationPresent(EndPoint.class)){
-                        EndPoint endPoint = method.getAnnotation(EndPoint.class);
-                        String path = basePath + endPoint.path();
-                        HttpMethod httpMethod = endPoint.method();
-                        Parameter[] parameters = method.getParameters();
-                        HashMap<String, Type> parametersMap = new HashMap<>();
-                        for (Parameter parameter : parameters){
-                            parametersMap.put(parameter.getName(), parameter.getParameterizedType());
-                        }
-                        EndpointDefinition endpointDefinition = new EndpointDefinition(controllerInstance, method, parametersMap);
-                        router.addRoute(path, httpMethod, endpointDefinition);
-                    }
 
-                }
+                registerEndpoints(router, methods, basePath, controllerInstance);
+
                 System.out.println("Registered controller: " + clazz.getName());
             }
-
         }
-
-
     }
 
-    private static File[] getFiles(String basePackage) {
+    private void registerEndpoints(Router router, Method[] methods, String basePath, Object controllerInstance) {
+        for (Method method : methods){
+            if (method.isAnnotationPresent(EndPoint.class)){
+                EndPoint endPoint = method.getAnnotation(EndPoint.class);
+                String path = basePath + endPoint.path();
+                HttpMethod httpMethod = endPoint.method();
+                Parameter[] parameters = method.getParameters();
+                HashMap<String, Type> parametersMap = new HashMap<>();
+                for (Parameter parameter : parameters){
+                    parametersMap.put(parameter.getName(), parameter.getParameterizedType());
+                }
+                EndpointDefinition endpointDefinition = new EndpointDefinition(controllerInstance, method, parametersMap);
+                router.addRoute(path, httpMethod, endpointDefinition);
+            }
+        }
+    }
+
+    private  File[] getFiles(String basePackage) {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         URL resource = classLoader.getResource(basePackage);
         if (resource == null) {

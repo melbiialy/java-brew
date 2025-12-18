@@ -15,8 +15,8 @@ public class Router {
     }
 
     public void addRoute(String path, HttpMethod method, EndpointDefinition endpointDefinition) {
-        HashMap<HttpMethod, EndpointDefinition> methodMap = routes.getOrDefault(path, new HashMap<>());
-        methodMap.put(method, endpointDefinition);
+        routes.computeIfAbsent(path, k -> new HashMap<>())
+                .put(method, endpointDefinition);
     }
     public void registerEndPoints(String basePackage) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         registry.registerEndPoints(basePackage, this);
