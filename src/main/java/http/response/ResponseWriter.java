@@ -13,7 +13,7 @@ import java.util.zip.GZIPOutputStream;
 
 public class ResponseWriter {
 
-    public void writeResponse(HTTPResponse response, Socket socket) throws IOException {
+    public void writeResponse(HttpResponse response, Socket socket) throws IOException {
         OutputStream out = socket.getOutputStream();
         StatusLine statusLine = response.getStatusLine();
 

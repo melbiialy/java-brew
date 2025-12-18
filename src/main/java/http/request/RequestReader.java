@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 public class RequestReader {
 
-    public HTTPRequest readRequest(Socket socket) throws IOException {
+    public HttpRequest readRequest(Socket socket) throws IOException {
 
 
         System.out.println("accepted new connection");
@@ -21,7 +21,7 @@ public class RequestReader {
 
         String contentLengthHeader = headers.get("Content-Length");
         String body = readRequestBody(contentLengthHeader, reader);
-        return new HTTPRequest(requestLine, headers, body);
+        return new HttpRequest(requestLine, headers, body);
 
 
     }

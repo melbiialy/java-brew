@@ -1,17 +1,12 @@
 import endpoints.*;
 
-import http.request.HTTPRequest;
-import http.response.HTTPResponse;
-import http.routing.Route;
+import http.request.HttpRequest;
+import http.response.HttpResponse;
+import http.routing.EndPointRegistry;
 import http.routing.Router;
-import http.server.HTTPServer;
-
-import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+import http.server.HttpServer;
 
 import java.util.List;
-import java.util.Objects;
 
 public class Main {
 
@@ -97,21 +92,9 @@ public class Main {
 //        out.print(response);
 //        out.flush();
 //    }
-        HTTPServer server = new HTTPServer(4221);
-        Route<HelloWorld> helloWorldRoute = new Route<>(HelloWorld.class, HelloWorld.class.getDeclaredMethod("sayHello", HTTPRequest.class, HTTPResponse.class,List.class),"GET");
-        Route<Home> homeRoute = new Route<>(Home.class, Home.class.getDeclaredMethod("home", HTTPRequest.class, HTTPResponse.class, List.class),"GET");
-        Router router = server.getRouter();
-        router.addEndPoint("/hello",helloWorldRoute);
-        router.addEndPoint("/",homeRoute);
-        Route<Echo> echoRoute = new Route<>(Echo.class, Echo.class.getDeclaredMethod("echo", HTTPRequest.class, HTTPResponse.class,List.class),"GET");
-        router.addEndPoint("/echo/{msg}",echoRoute);
-        Route<FileEndPoint> route = new Route<>(FileEndPoint.class, FileEndPoint.class.getDeclaredMethod("files", HTTPRequest.class, HTTPResponse.class,List.class),"GET");
-        router.addEndPoint("/files/{path}",route);
-        Route<UserAgent> userAgentRoute = new Route<>(UserAgent.class, UserAgent.class.getDeclaredMethod("userAgent", HTTPRequest.class, HTTPResponse.class,List.class),"GET");
-        router.addEndPoint("/user-agent",userAgentRoute);
-        Route<FileEndPoint> postFileRoute = new Route<>(FileEndPoint.class, FileEndPoint.class.getDeclaredMethod("postFile", HTTPRequest.class, HTTPResponse.class,List.class),"POST");
-        router.addEndPoint("/files/{filename}",postFileRoute);
-        server.start();
+        EndPointRegistry registry = new EndPointRegistry();
+        registry.registerEndPoints("endpoints",new Router());
+
 
 
 }

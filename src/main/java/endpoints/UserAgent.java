@@ -1,12 +1,12 @@
 package endpoints;
 
-import http.request.HTTPRequest;
-import http.response.HTTPResponse;
+import http.request.HttpRequest;
+import http.response.HttpResponse;
 
 import java.util.List;
 
 public class UserAgent {
-    public void userAgent(HTTPRequest request, HTTPResponse response, List<String> pathVariables){
+    public void userAgent(HttpRequest request, HttpResponse response, List<String> pathVariables){
         response.setBody(request.getHeaders().get("User-Agent"));
         response.getStatusLine().setStatusCode(200);
         response.getStatusLine().setStatusMessage("OK");

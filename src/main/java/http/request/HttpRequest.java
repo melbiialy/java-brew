@@ -2,16 +2,16 @@ package http.request;
 
 import java.util.HashMap;
 
-public class HTTPRequest {
+public class HttpRequest {
 
     private RequestLine requestLine;
     private HashMap<String, String> headers;
     private String body;
-    public HTTPRequest() {
+    public HttpRequest() {
         headers = new HashMap<>();
     }
 
-    public HTTPRequest(RequestLine requestLine, HashMap<String, String> headers, String body) {
+    public HttpRequest(RequestLine requestLine, HashMap<String, String> headers, String body) {
         this.requestLine = requestLine;
         this.headers = headers;
         this.body = body;
@@ -43,7 +43,7 @@ public class HTTPRequest {
 
     @Override
     public String toString() {
-        return "HTTPRequest{" +
+        return "HttpRequest{" +
                 "requestLine=" + requestLine +
                 ", headers=" + headers +
                 ", body='" + body + '\'' +

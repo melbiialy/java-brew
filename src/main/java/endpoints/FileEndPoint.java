@@ -1,7 +1,7 @@
 package endpoints;
 
-import http.request.HTTPRequest;
-import http.response.HTTPResponse;
+import http.request.HttpRequest;
+import http.response.HttpResponse;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.nio.file.Files;
 import java.util.List;
 
 public class FileEndPoint{
-    public void files(HTTPRequest request, HTTPResponse response, List<String> pathVariables) throws IOException {
+    public void files(HttpRequest request, HttpResponse response, List<String> pathVariables) throws IOException {
         String filename = pathVariables.getFirst();
         File file = new File("/tmp/data/codecrafters.io/http-server-tester/" + filename);
 
@@ -26,7 +26,7 @@ public class FileEndPoint{
         }
 //        System.out.println(Files.readString(file.toPath()));
     }
-    public void postFile(HTTPRequest request, HTTPResponse response, List<String> pathVariables) throws IOException {
+    public void postFile(HttpRequest request, HttpResponse response, List<String> pathVariables) throws IOException {
         String filename = pathVariables.getFirst();
         File file = new File("/tmp/data/codecrafters.io/http-server-tester/" + filename);
         Files.writeString(file.toPath(), request.getBody());
