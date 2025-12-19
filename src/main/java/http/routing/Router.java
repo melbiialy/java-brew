@@ -6,6 +6,8 @@ import http.exception.MethodNotMatchException;
 import http.exception.ResourceNotFoundException;
 import http.request.HttpRequest;
 import http.response.HttpResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -15,6 +17,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+
 /**
  * A Router class responsible for mapping HTTP requests to their respective
  * endpoint definitions and executing the appropriate logic.
@@ -22,6 +25,7 @@ import java.util.List;
  * based on the provided path and method.
  */
 public class Router {
+    private static final Logger log = LoggerFactory.getLogger(Router.class);
     private final HashMap<String,HashMap<HttpMethod, EndpointDefinition>> routes;
     private final EndPointRegistry registry;
 
@@ -31,7 +35,6 @@ public class Router {
     }
 
     public void addRoute(String path, HttpMethod method, EndpointDefinition endpointDefinition) {
-        System.out.println(path + " " + method);
         routes.computeIfAbsent(path, k -> new HashMap<>())
                 .put(method, endpointDefinition);
     }
@@ -51,6 +54,7 @@ public class Router {
                     System.out.println(pathVariables);
                     matchedEndpoint = entry.getValue().get(httpRequest.getRequestLine().getMethod());
                     if (matchedEndpoint == null) {
+                        log.error("HTTP Method {} does not match for path: {}", httpRequest.getRequestLine().getMethod(), httpRequest.getRequestLine().getPath());
                         throw new MethodNotMatchException("HTTP Method " + httpRequest.getRequestLine().getMethod() + " does not match for path: " + httpRequest.getRequestLine().getPath());
                     }
                     break;
@@ -58,6 +62,7 @@ public class Router {
             }
         }
         if (matchedEndpoint == null) {
+            log.error("No endpoint found for path: {}", httpRequest.getRequestLine().getPath());
             throw new ResourceNotFoundException("No endpoint found for path: " + httpRequest.getRequestLine().getPath());
         }
         List<ParameterInfo> parameterInfos = matchedEndpoint.parameters();

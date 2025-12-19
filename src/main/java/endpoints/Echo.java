@@ -13,7 +13,6 @@ import java.util.List;
 public class Echo {
     @EndPoint(method = HttpMethod.GET, path = "/{message}")
     public void echo(HttpRequest request, HttpResponse response, @PathVariable("message") String message){
-        System.out.println(message);
         response.setBody(message);
         response.getStatusLine().setStatusCode(200);
         response.getStatusLine().setStatusMessage("OK");

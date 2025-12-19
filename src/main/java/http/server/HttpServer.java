@@ -3,10 +3,14 @@ import http.request.HttpRequest;
 import http.request.RequestReader;
 import http.response.ResponseWriter;
 import http.routing.Router;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+
 
 /**
  * The HttpServer class represents a lightweight, multi-threaded HTTP server designed
@@ -20,6 +24,7 @@ public class HttpServer {
     private final RequestReader requestReader;
     private final HttpHandler httpHandler;
     private boolean running;
+    private final Logger logger = LoggerFactory.getLogger(HttpServer.class.getName());
 
     public HttpServer(int port) throws Exception {
         this.serverSocket = new ServerSocket(port);
@@ -32,8 +37,10 @@ public class HttpServer {
         this(8080);
     }
     public void start() throws Exception {
-        System.out.println("JavaBrew started and listening on port " + serverSocket.getLocalPort());
+        logger.info("Starting JavaBrew server...");
+        logger.info("Registering endpoints...");
         this.router.registerEndPoints("");
+        logger.info("JavaBrew server started successfully! on port: {}", serverSocket.getLocalPort());
         acceptConnections();
     }
 
@@ -43,7 +50,7 @@ public class HttpServer {
             socket.setTcpNoDelay(true);
             socket.setSoTimeout(0);
             socket.setKeepAlive(true);
-            System.out.println("accepted new connection");
+            logger.info("Accepted new connection from: {}", socket.getInetAddress());
             Thread thread = new Thread(()-> {
                 try {
 

@@ -4,6 +4,8 @@ import http.annotation.Controller;
 import http.annotation.EndPoint;
 import http.annotation.PathVariable;
 import http.enums.HttpMethod;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -14,6 +16,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 
 /**
  * A class responsible for discovering and registering endpoints within a specified package and mapping them
@@ -31,22 +34,26 @@ import java.util.List;
 
 public  class EndPointRegistry {
 
+    private static final Logger logger = LoggerFactory.getLogger(EndPointRegistry.class);
     public  void registerEndPoints(String basePackage, Router router) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         String packagePath = basePackage.replace('.','/');
+        try {
         File[] files = getFiles(packagePath);
-        for (File file : files){
+        for (File file : files) {
 
-            if (!file.getName().contains(".class")){
-                System.out.println("Registering subpackage: " + basePackage+"."+file.getName());
-                String subPackagePath = basePackage.isEmpty()?file.getName():basePackage+"."+file.getName();
+            if (!file.getName().contains(".class")) {
+                logger.trace("Scanning subpackage: {}.{}", basePackage, file.getName());
+
+                String subPackagePath = basePackage.isEmpty() ? file.getName() : basePackage + "." + file.getName();
                 registerEndPoints(subPackagePath, router);
                 continue;
             }
 
-            String className = basePackage.isEmpty()?file.getName().replace(".class",""):basePackage+"."+file.getName().replace(".class","");
+            String className = basePackage.isEmpty() ? file.getName().replace(".class", "") : basePackage + "." + file.getName().replace(".class", "");
             Class<?> clazz = Class.forName(className);
             if (clazz.isAnnotationPresent(Controller.class)) {
-                System.out.println("Registering controller: " + clazz.getName());
+                logger.trace("Registering controller: {}", className);
+
                 String basePath = clazz.getAnnotation(Controller.class).path();
                 Method[] methods = clazz.getMethods();
                 // todo handle to call the application context to get the controller object
@@ -54,9 +61,13 @@ public  class EndPointRegistry {
 
                 registerEndpoints(router, methods, basePath, controllerInstance);
 
-                System.out.println("Registered controller: " + clazz.getName());
+                logger.trace("Controller registered: {}", className);
 
             }
+        }
+        } catch (Exception e){
+            logger.warn("Failed to register endpoints for base package: {}", basePackage, e);
+            return;
         }
     }
 
@@ -90,11 +101,13 @@ public  class EndPointRegistry {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         URL resource = classLoader.getResource(basePackage);
         if (resource == null) {
+            logger.warn("No resources found for base package: {}", basePackage);
             throw new RuntimeException("No resources found for base package: " + basePackage);
         }
         File directory = new File(resource.getFile());
         File[] files = directory.listFiles();
         if (files == null){
+            logger.warn("No files found for base package: {}", basePackage);
             throw new RuntimeException("No files found for base package: " + basePackage);
         }
         return files;

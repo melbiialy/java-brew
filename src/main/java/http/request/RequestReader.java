@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -20,13 +19,11 @@ public class RequestReader {
 
 
         try {
-            System.out.println("accepted new connection");
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             RequestLine requestLine = new RequestLine();
             parseRequestLine(reader, requestLine);
-            System.out.println(requestLine);
             HashMap<String, String> headers = parseHeaders(reader);
-            System.out.println(headers);
+
 
             String contentLengthHeader = headers.get("Content-Length");
             String body = readRequestBody(contentLengthHeader, reader);
@@ -66,7 +63,6 @@ public class RequestReader {
     private static void parseRequestLine(BufferedReader reader, RequestLine requestLine) throws IOException {
         String line = reader.readLine();
         String[] requestLineParts = line.split(" ");
-        System.out.println(Arrays.toString(requestLineParts));
         requestLine.setMethod(HttpMethod.valueOf(requestLineParts[0]));
         requestLine.setPath(requestLineParts[1]);
         requestLine.setHttpVersion(requestLineParts[2]);
