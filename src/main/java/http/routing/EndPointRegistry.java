@@ -10,16 +10,40 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-public class EndPointRegistry {
+/**
+ * A class responsible for discovering and registering endpoints within a specified package and mapping them
+ * to application routes using a given {@link Router} instance. It processes classes annotated with {@code @Controller}
+ * and methods within those classes annotated with {@code @EndPoint}, allowing for dynamic route mapping in the application.
+ *
+ * Functionality includes:
+ * - Scanning packages for annotated classes and methods.
+ * - Registering routes based on annotations defined in controllers and methods.
+ * - Managing endpoints within a specified package hierarchy recursively.
+ *
+ * The class supports mapping HTTP methods, path definitions, and parameter information, ensuring a scalable and
+ * annotation-driven approach to route registration in web frameworks.
+ */
 
-    public void registerEndPoints(String basePackage, Router router) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        basePackage = basePackage.replace('.','/');
-        File[] files = getFiles(basePackage);
+public  class EndPointRegistry {
+
+    public  void registerEndPoints(String basePackage, Router router) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        String packagePath = basePackage.replace('.','/');
+        File[] files = getFiles(packagePath);
         for (File file : files){
-            if (!file.getName().endsWith(".class")) continue;
-            Class<?> clazz = Class.forName(basePackage+"." + file.getName().replace(".class", ""));
+
+            if (!file.getName().contains(".class")){
+                System.out.println("Registering subpackage: " + basePackage+"."+file.getName());
+                String subPackagePath = basePackage.isEmpty()?file.getName():basePackage+"."+file.getName();
+                registerEndPoints(subPackagePath, router);
+                continue;
+            }
+
+            String className = basePackage.isEmpty()?file.getName().replace(".class",""):basePackage+"."+file.getName().replace(".class","");
+            Class<?> clazz = Class.forName(className);
             if (clazz.isAnnotationPresent(Controller.class)) {
                 System.out.println("Registering controller: " + clazz.getName());
                 String basePath = clazz.getAnnotation(Controller.class).path();
@@ -34,24 +58,24 @@ public class EndPointRegistry {
         }
     }
 
-    private void registerEndpoints(Router router, Method[] methods, String basePath, Object controllerInstance) {
+    private static void registerEndpoints(Router router, Method[] methods, String basePath, Object controllerInstance) {
         for (Method method : methods){
             if (method.isAnnotationPresent(EndPoint.class)){
                 EndPoint endPoint = method.getAnnotation(EndPoint.class);
                 String path = basePath + endPoint.path();
                 HttpMethod httpMethod = endPoint.method();
                 Parameter[] parameters = method.getParameters();
-                HashMap<String, Type> parametersMap = new HashMap<>();
+                List<ParameterInfo> parameterInfos = new ArrayList<>();
                 for (Parameter parameter : parameters){
-                    parametersMap.put(parameter.getName(), parameter.getParameterizedType());
+                    parameterInfos.add(new ParameterInfo(parameter.getName(),parameter.getType()));
                 }
-                EndpointDefinition endpointDefinition = new EndpointDefinition(controllerInstance, method, parametersMap);
+                EndpointDefinition endpointDefinition = new EndpointDefinition(controllerInstance, method, parameterInfos);
                 router.addRoute(path, httpMethod, endpointDefinition);
             }
         }
     }
 
-    private  File[] getFiles(String basePackage) {
+    private static File[] getFiles(String basePackage) {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         URL resource = classLoader.getResource(basePackage);
         if (resource == null) {

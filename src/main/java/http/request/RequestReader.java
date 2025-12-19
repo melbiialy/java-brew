@@ -1,5 +1,7 @@
 package http.request;
 
+import http.enums.HttpMethod;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -54,7 +56,7 @@ public class RequestReader {
     private static void parseRequestLine(BufferedReader reader, RequestLine requestLine) throws IOException {
         String line = reader.readLine();
         String[] requestLineParts = line.split(" ");
-        requestLine.setMethod(requestLineParts[0]);
+        requestLine.setMethod(HttpMethod.valueOf(requestLineParts[0]));
         requestLine.setPath(requestLineParts[1]);
         requestLine.setHttpVersion(requestLineParts[2]);
     }

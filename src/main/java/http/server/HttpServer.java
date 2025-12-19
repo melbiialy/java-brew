@@ -9,21 +9,29 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class HttpServer {
+    private final Router router;
     private final ServerSocket serverSocket;
     private final RequestReader requestReader;
     private final HttpHandler httpHandler;
     private boolean running;
 
     public HttpServer(int port) throws Exception {
-        serverSocket = new ServerSocket(port);
-        requestReader = new RequestReader();
-        Router router = new Router();
-        httpHandler = new HttpHandler(router, new ResponseWriter());
-        running = true;
-
+        this.serverSocket = new ServerSocket(port);
+        this.router = new Router();
+        this.requestReader = new RequestReader();
+        this.httpHandler = new HttpHandler(this.router, new ResponseWriter());
+        this.running = true;
+    }
+    public HttpServer() throws Exception {
+        this(8080);
     }
     public void start() throws Exception {
-        System.out.println("Server started and listening on port " + serverSocket.getLocalPort());
+        System.out.println("JavaBrew started and listening on port " + serverSocket.getLocalPort());
+        this.router.registerEndPoints("");
+        acceptConnections();
+    }
+
+    private void acceptConnections() throws IOException {
         while (this.running){
             Socket socket = serverSocket.accept();
             socket.setTcpNoDelay(true);
@@ -42,13 +50,14 @@ public class HttpServer {
                             socket.close();
                         }
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             });
             thread.start();
         }
     }
+
     public void stop() {
         this.running = false;
     }

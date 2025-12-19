@@ -92,8 +92,8 @@ public class Main {
 //        out.print(response);
 //        out.flush();
 //    }
-        EndPointRegistry registry = new EndPointRegistry();
-        registry.registerEndPoints("endpoints",new Router());
+       HttpServer httpServer = new HttpServer();
+       httpServer.start();
 
 
 

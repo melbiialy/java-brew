@@ -1,23 +1,25 @@
 package http.request;
 
+import http.enums.HttpMethod;
+
 public class RequestLine {
-    private String method;
+    private HttpMethod method;
     private String path;
     private String httpVersion;
 
     public RequestLine() {
     }
-    public RequestLine(String method, String path, String httpVersion) {
+    public RequestLine(HttpMethod method, String path, String httpVersion) {
         this.method = method;
         this.path = path;
         this.httpVersion = httpVersion;
     }
 
-    public String getMethod() {
+    public HttpMethod getMethod() {
         return method;
     }
 
-    public void setMethod(String method) {
+    public void setMethod(HttpMethod method) {
         this.method = method;
     }
 

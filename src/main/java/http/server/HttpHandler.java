@@ -7,6 +7,7 @@ import http.response.StatusLine;
 import http.routing.Router;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 
 public class HttpHandler {
@@ -16,7 +17,7 @@ public class HttpHandler {
         this.router = router;
         this.responseWriter = responseWriter;
     }
-    public void process(HttpRequest httpRequest, Socket socket) throws IOException {
+    public void process(HttpRequest httpRequest, Socket socket) throws IOException, InvocationTargetException, IllegalAccessException {
         HttpResponse response = new HttpResponse();
         if (httpRequest.getHeaders() != null) {
             String encoding = httpRequest.getHeaders().get("Accept-Encoding");
@@ -29,7 +30,7 @@ public class HttpHandler {
             }
         }
         response.setStatusLine(new StatusLine("HTTP/1.1", 0, ""));
-//        router.route(httpRequest,response);
+        router.route(httpRequest,response);
         this.responseWriter.writeResponse(response, socket);
         System.out.println("Response sent to client");
     }
