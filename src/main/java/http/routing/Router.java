@@ -51,13 +51,10 @@ public class Router {
             if (UrlResolver.match( httpRequest.getRequestLine().getPath(),path)) {
                 if (entry.getValue().containsKey(httpRequest.getRequestLine().getMethod())){
                     pathVariables = UrlResolver.extractPathVariables(httpRequest.getRequestLine().getPath(), path);
-                    System.out.println(pathVariables);
                     matchedEndpoint = entry.getValue().get(httpRequest.getRequestLine().getMethod());
-                    if (matchedEndpoint == null) {
-                        log.error("HTTP Method {} does not match for path: {}", httpRequest.getRequestLine().getMethod(), httpRequest.getRequestLine().getPath());
-                        throw new MethodNotMatchException("HTTP Method " + httpRequest.getRequestLine().getMethod() + " does not match for path: " + httpRequest.getRequestLine().getPath());
-                    }
-                    break;
+                } else {
+                    log.error("HTTP method not allowed: {} for path: {}", httpRequest.getRequestLine().getMethod(), httpRequest.getRequestLine().getPath());
+                    throw new MethodNotMatchException("HTTP method not allowed: " + httpRequest.getRequestLine().getMethod() + " for path: " + httpRequest.getRequestLine().getPath());
                 }
             }
         }
@@ -67,20 +64,18 @@ public class Router {
         }
         List<ParameterInfo> parameterInfos = matchedEndpoint.parameters();
         Object[] args = new Object[parameterInfos.size()];
-        System.out.println(httpRequest.toString());
-        args[0] = httpRequest;
-        args[1] = response;
+
         int argIndex =0;
         for (ParameterInfo parameterInfo : parameterInfos){
-            if (argIndex<=1){
-                argIndex++;
-                continue;
+            if (parameterInfo.type()==HttpRequest.class){
+                args[argIndex++] = httpRequest;
+            } else if (parameterInfo.type()==HttpResponse.class){
+                args[argIndex++] = response;
+            }else {
+                String pathVariable = pathVariables.get(parameterInfo.name());
+                args[argIndex++] = castToType(pathVariable, parameterInfo.type());
             }
-            System.out.println(parameterInfo.name()+" "+parameterInfo.type());
-            String pathVariable = pathVariables.get(parameterInfo.name());
-            args[argIndex++] = castToType(pathVariable,parameterInfo.type());
         }
-        System.out.println(Arrays.toString(args));
         Method endpointMethod = matchedEndpoint.method();
         endpointMethod.setAccessible(true);
         endpointMethod.invoke(matchedEndpoint.controller(),args);
