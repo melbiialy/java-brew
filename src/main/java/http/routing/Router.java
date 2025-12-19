@@ -2,6 +2,8 @@ package http.routing;
 
 
 import http.enums.HttpMethod;
+import http.exception.MethodNotMatchException;
+import http.exception.ResourceNotFoundException;
 import http.request.HttpRequest;
 import http.response.HttpResponse;
 
@@ -48,12 +50,15 @@ public class Router {
                     pathVariables = UrlResolver.extractPathVariables(httpRequest.getRequestLine().getPath(), path);
                     System.out.println(pathVariables);
                     matchedEndpoint = entry.getValue().get(httpRequest.getRequestLine().getMethod());
+                    if (matchedEndpoint == null) {
+                        throw new MethodNotMatchException("HTTP Method " + httpRequest.getRequestLine().getMethod() + " does not match for path: " + httpRequest.getRequestLine().getPath());
+                    }
                     break;
                 }
             }
         }
         if (matchedEndpoint == null) {
-            throw new RuntimeException("No endpoint found for path: " + httpRequest.getRequestLine().getPath());
+            throw new ResourceNotFoundException("No endpoint found for path: " + httpRequest.getRequestLine().getPath());
         }
         List<ParameterInfo> parameterInfos = matchedEndpoint.parameters();
         Object[] args = new Object[parameterInfos.size()];
