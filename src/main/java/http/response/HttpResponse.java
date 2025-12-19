@@ -2,6 +2,11 @@ package http.response;
 
 import java.util.HashMap;
 
+/**
+ * Represents an HTTP Response, which consists of a status line, headers, and an optional body.
+ * This class is designed to encapsulate the components of a standard HTTP response, allowing
+ * easy manipulation and retrieval of response attributes.
+ */
 public class HttpResponse {
     private StatusLine statusLine;
     private HashMap<String, String> headers;

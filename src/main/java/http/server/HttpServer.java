@@ -8,6 +8,12 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * The HttpServer class represents a lightweight, multi-threaded HTTP server designed
+ * to handle incoming HTTP requests, route them to the appropriate handlers, and send
+ * responses back to clients. It supports custom endpoints and can handle multiple
+ * connections using separate threads.
+ */
 public class HttpServer {
     private final Router router;
     private final ServerSocket serverSocket;

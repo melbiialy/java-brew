@@ -1,5 +1,10 @@
 package http.response;
 
+/**
+ * Represents the status line of an HTTP response.
+ * The status line consists of the HTTP version, status code, and status message.
+ * It is a required component of an HTTP response.
+ */
 public class StatusLine {
     private String httpVersion;
     private int statusCode;

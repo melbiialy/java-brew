@@ -2,6 +2,7 @@ package http.routing;
 
 import http.annotation.Controller;
 import http.annotation.EndPoint;
+import http.annotation.PathVariable;
 import http.enums.HttpMethod;
 
 import java.io.File;
@@ -54,6 +55,7 @@ public  class EndPointRegistry {
                 registerEndpoints(router, methods, basePath, controllerInstance);
 
                 System.out.println("Registered controller: " + clazz.getName());
+
             }
         }
     }
@@ -64,15 +66,24 @@ public  class EndPointRegistry {
                 EndPoint endPoint = method.getAnnotation(EndPoint.class);
                 String path = basePath + endPoint.path();
                 HttpMethod httpMethod = endPoint.method();
-                Parameter[] parameters = method.getParameters();
-                List<ParameterInfo> parameterInfos = new ArrayList<>();
-                for (Parameter parameter : parameters){
-                    parameterInfos.add(new ParameterInfo(parameter.getName(),parameter.getType()));
-                }
+                List<ParameterInfo> parameterInfos = getParameterInfos(method);
                 EndpointDefinition endpointDefinition = new EndpointDefinition(controllerInstance, method, parameterInfos);
                 router.addRoute(path, httpMethod, endpointDefinition);
             }
         }
+    }
+
+    private static List<ParameterInfo> getParameterInfos(Method method) {
+        Parameter[] parameters = method.getParameters();
+        List<ParameterInfo> parameterInfos = new ArrayList<>();
+        for (Parameter parameter : parameters){
+            String parameterName = parameter.getName();
+            if (parameter.isAnnotationPresent(PathVariable.class)){
+                parameterName = parameter.getAnnotation(PathVariable.class).value();
+            }
+            parameterInfos.add(new ParameterInfo(parameterName,parameter.getType()));
+        }
+        return parameterInfos;
     }
 
     private static File[] getFiles(String basePackage) {

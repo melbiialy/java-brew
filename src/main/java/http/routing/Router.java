@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class Router {
     }
 
     public void addRoute(String path, HttpMethod method, EndpointDefinition endpointDefinition) {
+        System.out.println(path + " " + method);
         routes.computeIfAbsent(path, k -> new HashMap<>())
                 .put(method, endpointDefinition);
     }
@@ -38,12 +40,13 @@ public class Router {
 
     public void route(HttpRequest httpRequest, HttpResponse response) throws InvocationTargetException, IllegalAccessException {
         EndpointDefinition matchedEndpoint = null;
-        HashMap<String, String> pathVariables = null;
+        HashMap<String, String> pathVariables = new HashMap<>();
         for (HashMap.Entry<String, HashMap<HttpMethod, EndpointDefinition>> entry : routes.entrySet()) {
             String path = entry.getKey();
-            if (UrlResolver.match(path, httpRequest.getRequestLine().getPath())) {
+            if (UrlResolver.match( httpRequest.getRequestLine().getPath(),path)) {
                 if (entry.getValue().containsKey(httpRequest.getRequestLine().getMethod())){
                     pathVariables = UrlResolver.extractPathVariables(httpRequest.getRequestLine().getPath(), path);
+                    System.out.println(pathVariables);
                     matchedEndpoint = entry.getValue().get(httpRequest.getRequestLine().getMethod());
                     break;
                 }
@@ -52,18 +55,25 @@ public class Router {
         if (matchedEndpoint == null) {
             throw new RuntimeException("No endpoint found for path: " + httpRequest.getRequestLine().getPath());
         }
-        List<ParameterInfo> parameterInfos = matchedEndpoint.getParameters();
-        Object[] args = new Object[parameterInfos.size()+2];
+        List<ParameterInfo> parameterInfos = matchedEndpoint.parameters();
+        Object[] args = new Object[parameterInfos.size()];
+        System.out.println(httpRequest.toString());
         args[0] = httpRequest;
         args[1] = response;
-        int argIndex = 0;
+        int argIndex =0;
         for (ParameterInfo parameterInfo : parameterInfos){
+            if (argIndex<=1){
+                argIndex++;
+                continue;
+            }
+            System.out.println(parameterInfo.name()+" "+parameterInfo.type());
             String pathVariable = pathVariables.get(parameterInfo.name());
             args[argIndex++] = castToType(pathVariable,parameterInfo.type());
         }
-        Method endpointMethod = matchedEndpoint.getMethod();
+        System.out.println(Arrays.toString(args));
+        Method endpointMethod = matchedEndpoint.method();
         endpointMethod.setAccessible(true);
-        endpointMethod.invoke(matchedEndpoint.getController(),args);
+        endpointMethod.invoke(matchedEndpoint.controller(),args);
     }
     public Object castToType(String value, Type type) {
         // Get the actual class from Type

@@ -2,6 +2,16 @@ package http.request;
 
 import java.util.HashMap;
 
+/**
+ * The HttpRequest class represents an HTTP request, encapsulating its various
+ * components such as the request line, headers, and body. It provides methods
+ * to construct, retrieve, and modify these components.
+ *
+ * Components of an HTTP request:
+ * - Request Line: Contains the HTTP method, the request path, and the HTTP version.
+ * - Headers: A collection of key-value pairs representing HTTP headers.
+ * - Body: The optional payload or content of the HTTP request.
+ */
 public class HttpRequest {
 
     private RequestLine requestLine;

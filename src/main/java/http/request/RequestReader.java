@@ -6,24 +6,34 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.HashMap;
 
+/**
+ * The RequestReader class is responsible for reading and parsing HTTP requests
+ * from a socket connection. It extracts the request line, headers, and body
+ * from the incoming request and constructs an HttpRequest object.
+ */
 public class RequestReader {
 
     public HttpRequest readRequest(Socket socket) throws IOException {
 
 
-        System.out.println("accepted new connection");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        RequestLine requestLine = new RequestLine();
-        parseRequestLine(reader, requestLine);
-        System.out.println(requestLine);
-        HashMap<String, String> headers = parseHeaders(reader);
-        System.out.println(headers);
+        try {
+            System.out.println("accepted new connection");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            RequestLine requestLine = new RequestLine();
+            parseRequestLine(reader, requestLine);
+            System.out.println(requestLine);
+            HashMap<String, String> headers = parseHeaders(reader);
+            System.out.println(headers);
 
-        String contentLengthHeader = headers.get("Content-Length");
-        String body = readRequestBody(contentLengthHeader, reader);
-        return new HttpRequest(requestLine, headers, body);
+            String contentLengthHeader = headers.get("Content-Length");
+            String body = readRequestBody(contentLengthHeader, reader);
+            return new HttpRequest(requestLine, headers, body);
+        }catch (Exception e) {
+            return null;
+        }
 
 
     }
@@ -56,6 +66,7 @@ public class RequestReader {
     private static void parseRequestLine(BufferedReader reader, RequestLine requestLine) throws IOException {
         String line = reader.readLine();
         String[] requestLineParts = line.split(" ");
+        System.out.println(Arrays.toString(requestLineParts));
         requestLine.setMethod(HttpMethod.valueOf(requestLineParts[0]));
         requestLine.setPath(requestLineParts[1]);
         requestLine.setHttpVersion(requestLineParts[2]);

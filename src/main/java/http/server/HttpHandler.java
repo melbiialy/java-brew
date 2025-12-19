@@ -10,9 +10,15 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 
+/**
+ * The HttpHandler class is responsible for processing incoming HTTP requests, routing them
+ * to the appropriate endpoint using the provided Router, and then writing the HTTP response
+ * back to the client via the ResponseWriter.
+ */
 public class HttpHandler {
     private final Router router;
     private final ResponseWriter responseWriter;
+
     public HttpHandler(Router router, ResponseWriter responseWriter) {
         this.router = router;
         this.responseWriter = responseWriter;

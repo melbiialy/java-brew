@@ -2,6 +2,13 @@ package http.request;
 
 import http.enums.HttpMethod;
 
+/**
+ * Represents the request line of an HTTP request, which consists of
+ * the HTTP method, the path, and the HTTP version.
+ *
+ * The request line is the first line of an HTTP request message and follows
+ * the structure: `<HTTP_METHOD> <REQUEST_PATH> <HTTP_VERSION>`.
+ */
 public class RequestLine {
     private HttpMethod method;
     private String path;

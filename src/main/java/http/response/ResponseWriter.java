@@ -10,7 +10,11 @@ import java.nio.charset.StandardCharsets;
 
 import java.util.zip.GZIPOutputStream;
 
-
+/**
+ * The ResponseWriter class is responsible for serializing an HttpResponse object
+ * and sending it over a given socket connection. It manages the HTTP response's
+ * status line, headers, and body, as well as encoding the body when necessary.
+ */
 public class ResponseWriter {
 
     public void writeResponse(HttpResponse response, Socket socket) throws IOException {
