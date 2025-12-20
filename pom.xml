@@ -3,10 +3,14 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <groupId>com.elbialy</groupId>
+    <artifactId>javabrew-server</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>JavaBrew HTTP Server</name>
+    <description>A lightweight HTTP server for Java</description>
 
-    <groupId>io.codecrafters</groupId>
-    <artifactId>codecrafters-http-server</artifactId>
-    <version>1.0</version>
+
 
     <properties>
         <maven.compiler.source>23</maven.compiler.source>

@@ -3,6 +3,7 @@ import http.request.HttpRequest;
 import http.request.RequestReader;
 import http.response.ResponseWriter;
 import http.routing.Router;
+import http.utils.Banner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,8 +38,7 @@ public class HttpServer {
         this(8080);
     }
     public void start() throws Exception {
-        logger.info("Starting JavaBrew server...");
-        logger.info("Registering endpoints...");
+        new Banner().print();
         this.router.registerEndPoints("");
         logger.info("JavaBrew server started successfully! on port: {}", serverSocket.getLocalPort());
         acceptConnections();

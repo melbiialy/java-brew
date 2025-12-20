@@ -1,14 +1,15 @@
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import endpoints.*;
+
 
 
 import http.server.HttpServer;
+import http.utils.Banner;
 import org.slf4j.LoggerFactory;
 
 
 
-public class Main {
+public class JavaBrew {
 
     public static void main(String[] args) throws Exception {
         Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
