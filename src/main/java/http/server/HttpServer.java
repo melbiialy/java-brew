@@ -10,7 +10,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 
 /**
@@ -20,6 +22,7 @@ import java.net.Socket;
  * connections using separate threads.
  */
 public class HttpServer {
+    private final ExecutorService executor;
     private final Router router;
     private final ServerSocket serverSocket;
     private final RequestReader requestReader;
@@ -33,6 +36,7 @@ public class HttpServer {
         this.requestReader = new RequestReader();
         this.httpHandler = new HttpHandler(this.router, new ResponseWriter());
         this.running = true;
+        this.executor = Executors.newFixedThreadPool(10);
     }
     public HttpServer() throws Exception {
         this(8080);
@@ -51,28 +55,29 @@ public class HttpServer {
             socket.setSoTimeout(0);
             socket.setKeepAlive(true);
             logger.info("Accepted new connection from: {}", socket.getInetAddress());
-            Thread thread = new Thread(()-> {
-                try {
+            executor.execute(() -> {
+                try (Socket socket1 = socket){
 
                     HttpRequest httpRequest ;
-                    while ((httpRequest = requestReader.readRequest(socket))!=null) {
+                    while ((httpRequest = requestReader.readRequest(socket1))!=null) {
                         boolean closeConnection = httpRequest.getHeaders().containsKey("Connection") && httpRequest.getHeaders().get("Connection").equals("close");
 
-                        httpHandler.process(httpRequest, socket);
+                        httpHandler.process(httpRequest, socket1);
                         if (closeConnection) {
-                            socket.close();
+                            socket1.close();
                         }
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             });
-            thread.start();
+
         }
     }
 
     public void stop() {
         this.running = false;
+        executor.shutdown();
     }
 
 }
