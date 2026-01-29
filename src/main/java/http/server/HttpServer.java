@@ -36,7 +36,7 @@ public class HttpServer {
         this.requestReader = new RequestReader();
         this.httpHandler = new HttpHandler(this.router, new ResponseWriter());
         this.running = true;
-        this.executor = Executors.newFixedThreadPool(10);
+        this.executor = Executors.newVirtualThreadPerTaskExecutor();
     }
     public HttpServer() throws Exception {
         this(8080);
