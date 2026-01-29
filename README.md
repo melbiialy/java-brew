@@ -403,16 +403,7 @@ JavaBrew is designed for high concurrency:
 - **Efficient Routing** — O(n) route matching with early termination
 - **Zero-Copy Where Possible** — Direct socket I/O without unnecessary buffering
 
-### Benchmarks
 
-For a simple "Hello World" endpoint:
-- **Throughput**: ~10,000+ requests/second (on modern hardware)
-- **Latency**: <1ms (p99) for simple endpoints
-- **Memory**: Low overhead per connection (~1KB per virtual thread)
-
-*Note: Performance depends on hardware, JVM tuning, and endpoint complexity.*
-
----
 
 ## 🎓 What I Learned
 
@@ -429,21 +420,6 @@ Building this HTTP server from scratch taught me:
 
 ---
 
-## 🛣️ Roadmap
-
-- [x] Virtual threads (Project Loom) ✅ **Implemented**
-- [ ] Query parameter parsing (`?key=value&foo=bar`)
-- [ ] Request body JSON deserialization (automatic `@RequestBody` binding)
-- [ ] Middleware/filter chain support (pre/post processing)
-- [ ] Static file serving (`/static/**` routes)
-- [ ] Request validation and error messages
-- [ ] CORS support
-- [ ] WebSocket support
-- [ ] HTTP/2 support
-- [ ] Request/Response interceptors
-- [ ] Dependency injection container
-
----
 
 ## 🤝 Contributing
 
