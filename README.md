@@ -403,6 +403,39 @@ JavaBrew is designed for high concurrency:
 - **Efficient Routing** — O(n) route matching with early termination
 - **Zero-Copy Where Possible** — Direct socket I/O without unnecessary buffering
 
+### Benchmark Results
+
+Real-world performance tested with `wrk` on a simple GET endpoint:
+
+```bash
+wrk -t8 -c1000 -d30s http://localhost:8080/test
+```
+
+**Results:**
+- **Throughput**: **169,640 requests/second** 🚀
+- **Total Requests**: 5,097,862 requests in 30 seconds
+- **Average Latency**: 8.53ms
+- **Max Latency**: 1.87s
+- **Error Rate**: 0.004% (209 timeouts out of 5M+ requests)
+- **Test Configuration**: 8 threads, 1000 concurrent connections
+
+| Metric | Value | Status |
+|--------|-------|--------|
+| Requests/sec | 169,640 | ✅ Excellent |
+| Avg Latency | 8.53ms | ✅ Very Good |
+| Max Latency | 1.87s | ⚠️ High variance |
+| Error Rate | 0.004% | ✅ Excellent |
+| Concurrent Connections | 1,000 | ✅ Handled well |
+
+### Performance Characteristics
+
+- **High Throughput**: Capable of handling 170k+ requests/second on modern hardware
+- **Low Latency**: Sub-10ms average response time for simple endpoints
+- **Scalability**: Virtual threads enable handling thousands of concurrent connections efficiently
+- **Memory Efficiency**: Low overhead per connection (~1KB per virtual thread)
+
+*Note: Performance depends on hardware, JVM tuning, endpoint complexity, and network conditions.*
+
 
 
 ## 🎓 What I Learned
