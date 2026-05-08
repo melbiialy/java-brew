@@ -22,6 +22,9 @@ public class Endpoint {
         return info.method().equals(method)
                 &&info.pattern().matchesPath(path);
     }
+    public Map<String, String> getPathVariables(String path) {
+        return info.pattern().match(path);
+    }
 
     public Object invoke(HttpRequest request, Map<String, String> pathVars)
             throws Exception {
@@ -72,5 +75,17 @@ public class Endpoint {
         throw new IllegalArgumentException(
                 "No converter for type '" + type.getName() + "' on path variable '" + raw + "'"
         );
+    }
+    public EndPointInfo getInfo() {
+        return info;
+    }
+    public HandlerMethod getHandler() {
+        return handler;
+    }
+    public ParameterDescriptor[] parameters() {
+        return parameters;
+    }
+    public ResponseDescriptor getResponseDescriptor() {
+        return responseDescriptor;
     }
 }
