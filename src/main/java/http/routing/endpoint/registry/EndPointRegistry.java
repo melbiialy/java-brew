@@ -1,8 +1,6 @@
 package http.routing.endpoint.registry;
 
-import http.enums.HttpMethod;
-import http.exception.MethodNotMatchException;
-import http.exception.ResourceNotFoundException;
+
 import http.request.HttpRequest;
 import http.routing.endpoint.definition.Endpoint;
 
@@ -31,26 +29,16 @@ public class EndPointRegistry implements Registry{
     }
     @Override
     public Endpoint getEndPoint(HttpRequest request){
-        boolean isMatchPath = false;
+
         for (Endpoint endpoint : endpoints) {
-            Map<String, String> pathVariables = endpoint.getInfo()
-                    .pattern()
-                    .match(request.getRequestLine().getPath());
-            if (pathVariables == null) continue;
-
-            if (!endpoint.getInfo().method().equals(request.getRequestLine().getMethod())) {
-                isMatchPath = true;
-                continue;
+            if (endpoint.matches(request.getRequestLine().getMethod(),
+                    request.getRequestLine().getPath(),request.getHeaders().get("content-type"))) {
+               Map<String ,String > pathVariables = endpoint.getPathVariables(request.getRequestLine().getPath());
+                request.setPathVariables(pathVariables);
+                return endpoint;
             }
-
-            request.setPathVariables(pathVariables);
-
-            return endpoint;
         }
-        if (isMatchPath) {
-            throw new MethodNotMatchException("HTTP method not allowed: " + request.getRequestLine().getMethod() + " for path: " + request.getRequestLine().getPath());
-        }
-        throw new ResourceNotFoundException("No endpoint found for path: " + request.getRequestLine().getPath());
+        return null;
     }
 
 
