@@ -1,5 +1,6 @@
 package http.annotation;
 
+import http.enums.ContentType;
 import http.enums.HttpMethod;
 
 import java.lang.annotation.*;
@@ -23,4 +24,6 @@ import java.lang.annotation.*;
 public @interface EndPoint {
     String path() default "/";
     HttpMethod method() default HttpMethod.GET;
+    ContentType consumes() default ContentType.APPLICATION_JSON;
+    ContentType produces() default ContentType.APPLICATION_JSON;
 }

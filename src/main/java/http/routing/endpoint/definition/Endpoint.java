@@ -24,12 +24,8 @@ public class Endpoint {
     }
 
     private boolean matchContentType(String contentType) {
-        for (String s : info.consumes()) {
-            if (s.equals(contentType)) {
-                return true;
-            }
-        }
-        return false;
+
+        return contentType.equals(info.consumes());
     }
 
     public Map<String, String> getPathVariables(String path) {
