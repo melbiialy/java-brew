@@ -8,11 +8,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.HashMap;
 
-/**
- * The RequestReader class is responsible for reading and parsing HTTP requests
- * from a socket connection. It extracts the request line, headers, and body
- * from the incoming request and constructs an HttpRequest object.
- */
+
 public class RequestReader {
 
     public HttpRequest readRequest(Socket socket) throws IOException {

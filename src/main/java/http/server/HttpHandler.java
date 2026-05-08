@@ -16,11 +16,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 
 
-/**
- * The HttpHandler class is responsible for processing incoming HTTP requests, routing them
- * to the appropriate endpoint using the provided Router, and then writing the HTTP response
- * back to the client via the ResponseWriter.
- */
 public class HttpHandler {
     private final Router router;
     private final ResponseWriter responseWriter;
@@ -45,13 +40,12 @@ public class HttpHandler {
         response.setStatusLine(new StatusLine("HTTP/1.1", 200, "OK"));
         try {
             Endpoint endpoint = router.route(httpRequest);
-             Object res = endpoint.invoke(httpRequest, response, httpRequest.getPathVariables());
+             endpoint.invoke(httpRequest, response, httpRequest.getPathVariables());
              // todo handle response
 
             if (!response.getHeaders().containsKey("Content-Type")
-                    && endpoint.getInfo().produces() != null
-                    && !endpoint.getInfo().produces().isBlank()) {
-                response.getHeaders().put("Content-Type", endpoint.getInfo().produces());
+                    && endpoint.getInfo().produces() != null) {
+                response.getHeaders().put("Content-Type", endpoint.getInfo().produces().value);
             }
         } catch (MethodNotMatchException ex) {
             response.setStatusLine(new StatusLine("HTTP/1.1", 405, "Method Not Allowed"));
