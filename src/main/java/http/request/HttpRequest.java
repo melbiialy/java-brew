@@ -1,6 +1,7 @@
 package http.request;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The HttpRequest class represents an HTTP request, encapsulating its various
@@ -16,6 +17,7 @@ public class HttpRequest {
 
     private RequestLine requestLine;
     private HashMap<String, String> headers;
+    private Map<String, String> pathVariables;
     private String body;
     public HttpRequest() {
         headers = new HashMap<>();
@@ -49,6 +51,12 @@ public class HttpRequest {
 
     public void setBody(String body) {
         this.body = body;
+    }
+    public Map<String, String> getPathVariables() {
+        return pathVariables;
+    }
+    public void setPathVariables(Map<String, String> pathVariables) {
+        this.pathVariables = pathVariables;
     }
 
     @Override
