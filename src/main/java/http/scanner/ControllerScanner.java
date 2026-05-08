@@ -53,13 +53,13 @@ public class ControllerScanner implements ClassPathScanner{
         URL resource = classLoader.getResource(basePackage);
         if (resource == null) {
             logger.warn("No resources found for base package: {}", basePackage);
-            throw new RuntimeException("No resources found for base package: " + basePackage);
+            return new File[0];
         }
         File directory = new File(resource.getFile());
         File[] files = directory.listFiles();
         if (files == null){
             logger.warn("No files found for base package: {}", basePackage);
-            throw new RuntimeException("No files found for base package: " + basePackage);
+            return new File[0];
         }
         return files;
     }

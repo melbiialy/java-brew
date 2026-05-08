@@ -2,6 +2,7 @@ package http.routing.endpoint.definition;
 
 import http.enums.HttpMethod;
 import http.request.HttpRequest;
+import http.response.HttpResponse;
 
 import java.util.Map;
 import java.util.UUID;
@@ -20,7 +21,7 @@ public class Endpoint {
     }
     public boolean matches(HttpMethod method, String path,String contentType) {
         return info.method().equals(method)
-                &&info.pattern().matchesPath(path)&&matchContentType(contentType);
+                &&info.pattern().matchesPath(path);
     }
 
     private boolean matchContentType(String contentType) {
@@ -32,24 +33,31 @@ public class Endpoint {
         return info.pattern().match(path);
     }
 
-    public Object invoke(HttpRequest request, Map<String, String> pathVars)
+    public Object invoke(HttpRequest request, HttpResponse response, Map<String, String> pathVars)
             throws Exception {
-        Object[] args = resolveArgs(request, pathVars);
-        return handler.method().invoke(handler.bean(), args);
+        Object[] args = resolveArgs(request,response, pathVars);
+         handler.method().invoke(handler.bean(), args);
+         return null;
     }
 
-    private Object[] resolveArgs(HttpRequest request, Map<String, String> pathVars) {
+    private Object[] resolveArgs(HttpRequest request,HttpResponse response, Map<String, String> pathVars) {
         Object[] args = new Object[parameters.length];
 
         for (ParameterDescriptor parameter : parameters) {
-
-            if (pathVars.containsKey(parameter.name())) {
-                String pathVariable = pathVars.get(parameter.name());
-                handlePathVar(args,parameter,pathVariable);
-            }else if (parameter.type() == HttpRequest.class) {
-                args[parameter.index()] = request;
+            if (parameter == null) {
+                continue;
             }
 
+            if (parameter.type() == HttpRequest.class) {
+                args[parameter.index()] = request;
+            } else if (parameter.type() == HttpResponse.class) {
+                args[parameter.index()] = response;
+            } else if (parameter.source() == ParamSource.PATH
+                    && pathVars != null
+                    && pathVars.containsKey(parameter.name())) {
+                String pathVariable = pathVars.get(parameter.name());
+                handlePathVar(args, parameter, pathVariable);
+            }
         }
         return args;
     }

@@ -3,6 +3,12 @@ import http.request.HttpRequest;
 import http.request.RequestReader;
 import http.response.ResponseWriter;
 import http.routing.Router;
+import http.routing.endpoint.registry.EndPointRegistry;
+import http.routing.endpoint.registry.Registry;
+import http.scanner.ClassPathScanner;
+import http.scanner.ControllerScanner;
+import http.scanner.EndpointScanner;
+import http.scanner.MethodScanner;
 import http.utils.Banner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -22,6 +30,8 @@ import java.util.concurrent.ThreadPoolExecutor;
  * connections using separate threads.
  */
 public class HttpServer {
+    private final ClassPathScanner scanner;
+    private final MethodScanner methodScanner;
     private final ExecutorService executor;
     private final Router router;
     private final ServerSocket serverSocket;
@@ -36,14 +46,18 @@ public class HttpServer {
         this.requestReader = new RequestReader();
         this.httpHandler = new HttpHandler(this.router, new ResponseWriter());
         this.running = true;
-        this.executor = Executors.newVirtualThreadPerTaskExecutor();
+        this.executor = Executors.newCachedThreadPool();
+        this.scanner = new ControllerScanner();
+        this.methodScanner = new EndpointScanner();
+        EndPointRegistry.getInstance();
     }
     public HttpServer() throws Exception {
         this(8080);
     }
     public void start() throws Exception {
         new Banner().print();
-        this.router.registerEndPoints("");
+        List<Class<?>> controllers = scanner.scan("example");
+        methodScanner.scan(controllers);
         logger.info("JavaBrew server started successfully! on port: {}", serverSocket.getLocalPort());
         acceptConnections();
     }
@@ -56,19 +70,23 @@ public class HttpServer {
             socket.setKeepAlive(true);
             logger.info("Accepted new connection from: {}", socket.getInetAddress());
             executor.execute(() -> {
-                try (Socket socket1 = socket){
-
-                    HttpRequest httpRequest ;
-                    while ((httpRequest = requestReader.readRequest(socket1))!=null) {
-                        boolean closeConnection = httpRequest.getHeaders().containsKey("Connection") && httpRequest.getHeaders().get("Connection").equals("close");
+                try (Socket socket1 = socket) {
+                    HttpRequest httpRequest;
+                    while ((httpRequest = requestReader.readRequest(socket1)) != null) {
+                        boolean closeConnection = httpRequest.getHeaders().containsKey("Connection")
+                                && httpRequest.getHeaders().get("Connection").equalsIgnoreCase("close");
 
                         httpHandler.process(httpRequest, socket1);
                         if (closeConnection) {
-                            socket1.close();
+                            break;
                         }
                     }
+                } catch (SocketException e) {
+                    logger.debug("Client disconnected: {}", e.getMessage());
+                } catch (IOException e) {
+                    logger.warn("I/O error on connection: {}", e.getMessage());
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    logger.error("Unexpected error on connection", e);
                 }
             });
 

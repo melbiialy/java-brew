@@ -4,8 +4,12 @@ package http.routing;
 import http.enums.HttpMethod;
 import http.exception.MethodNotMatchException;
 import http.exception.ResourceNotFoundException;
+import http.exception.UnSupportedContentType;
 import http.request.HttpRequest;
 import http.response.HttpResponse;
+import http.routing.endpoint.definition.Endpoint;
+import http.routing.endpoint.registry.EndPointRegistry;
+import http.routing.endpoint.registry.Registry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,98 +30,29 @@ import java.util.List;
  */
 public class Router {
     private static final Logger log = LoggerFactory.getLogger(Router.class);
-    private final HashMap<String,HashMap<HttpMethod, EndpointDefinition>> routes;
-    private final EndPointRegistry registry;
+    private final Registry registry;
 
     public Router() {
-        routes = new HashMap<>();
-        registry = new EndPointRegistry();
-    }
-
-    public void addRoute(String path, HttpMethod method, EndpointDefinition endpointDefinition) {
-        routes.computeIfAbsent(path, k -> new HashMap<>())
-                .put(method, endpointDefinition);
-    }
-    public void registerEndPoints(String basePackage) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        registry.registerEndPoints(basePackage, this);
+        this.registry = EndPointRegistry.getInstance();
     }
 
 
-    public void route(HttpRequest httpRequest, HttpResponse response) throws InvocationTargetException, IllegalAccessException {
-        EndpointDefinition matchedEndpoint = null;
-        HashMap<String, String> pathVariables = new HashMap<>();
-        for (HashMap.Entry<String, HashMap<HttpMethod, EndpointDefinition>> entry : routes.entrySet()) {
-            String path = entry.getKey();
-            if (UrlResolver.match( httpRequest.getRequestLine().getPath(),path)) {
-                if (entry.getValue().containsKey(httpRequest.getRequestLine().getMethod())){
-                    pathVariables = UrlResolver.extractPathVariables(httpRequest.getRequestLine().getPath(), path);
-                    matchedEndpoint = entry.getValue().get(httpRequest.getRequestLine().getMethod());
-                } else {
-                    log.error("HTTP method not allowed: {} for path: {}", httpRequest.getRequestLine().getMethod(), httpRequest.getRequestLine().getPath());
-                    throw new MethodNotMatchException("HTTP method not allowed: " + httpRequest.getRequestLine().getMethod() + " for path: " + httpRequest.getRequestLine().getPath());
-                }
-            }
+    public Endpoint route(HttpRequest httpRequest)  {
+        log.info("Routing request: {}", httpRequest);
+        Endpoint matchedEndpoint = registry.getEndPoint(httpRequest);
+        if (matchedEndpoint != null) {
+            return matchedEndpoint;
         }
-        if (matchedEndpoint == null) {
-            log.error("No endpoint found for path: {}", httpRequest.getRequestLine().getPath());
-            throw new ResourceNotFoundException("No endpoint found for path: " + httpRequest.getRequestLine().getPath());
+        if (registry.anyMatchedPathAndMethod(httpRequest.getRequestLine().getPath(),httpRequest.getRequestLine().getMethod())){
+            throw new UnSupportedContentType("UnSupported Content-Type");
         }
-        List<ParameterInfo> parameterInfos = matchedEndpoint.parameters();
-        Object[] args = new Object[parameterInfos.size()];
+        else if (registry.anyMatchesPath(httpRequest.getRequestLine().getPath())){
+            throw new MethodNotMatchException("Method Not Match");
+        }
+        else{
+            throw new ResourceNotFoundException("Resource Not Found");
+        }
 
-        int argIndex =0;
-        for (ParameterInfo parameterInfo : parameterInfos){
-            if (parameterInfo.type()==HttpRequest.class){
-                args[argIndex++] = httpRequest;
-            } else if (parameterInfo.type()==HttpResponse.class){
-                args[argIndex++] = response;
-            }else {
-                String pathVariable = pathVariables.get(parameterInfo.name());
-                args[argIndex++] = castToType(pathVariable, parameterInfo.type());
-            }
-        }
-        Method endpointMethod = matchedEndpoint.method();
-        endpointMethod.setAccessible(true);
-        endpointMethod.invoke(matchedEndpoint.controller(),args);
     }
-    public Object castToType(String value, Type type) {
-        // Get the actual class from Type
-        Class<?> clazz;
-        if (type instanceof Class) {
-            clazz = (Class<?>) type;
-        } else if (type instanceof ParameterizedType paramType) {
-            clazz = (Class<?>) paramType.getRawType();
-        } else {
-            return value; // fallback
-        }
 
-        // Cast based on type
-        if (clazz == String.class) {
-            return value;
-        }
-        if (clazz == int.class || clazz == Integer.class) {
-            return Integer.parseInt(value);
-        }
-        if (clazz == long.class || clazz == Long.class) {
-            return Long.parseLong(value);
-        }
-        if (clazz == double.class || clazz == Double.class) {
-            return Double.parseDouble(value);
-        }
-        if (clazz == float.class || clazz == Float.class) {
-            return Float.parseFloat(value);
-        }
-        if (clazz == boolean.class || clazz == Boolean.class) {
-            return Boolean.parseBoolean(value);
-        }
-        if (clazz == short.class || clazz == Short.class) {
-            return Short.parseShort(value);
-        }
-        if (clazz == byte.class || clazz == Byte.class) {
-            return Byte.parseByte(value);
-        }
-
-
-        return value;
-    }
 }

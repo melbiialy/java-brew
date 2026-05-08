@@ -1,8 +1,11 @@
 package http.routing.endpoint.registry;
 
 
+import http.enums.HttpMethod;
 import http.request.HttpRequest;
 import http.routing.endpoint.definition.Endpoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public class EndPointRegistry implements Registry{
+    private static final Logger log = LoggerFactory.getLogger(EndPointRegistry.class);
     public static EndPointRegistry instance;
     private final List<Endpoint> endpoints;
 
@@ -30,15 +34,24 @@ public class EndPointRegistry implements Registry{
     @Override
     public Endpoint getEndPoint(HttpRequest request){
 
+        log.info("Request path: {}",request.getRequestLine().getPath());
         for (Endpoint endpoint : endpoints) {
             if (endpoint.matches(request.getRequestLine().getMethod(),
-                    request.getRequestLine().getPath(),request.getHeaders().get("content-type"))) {
+                    request.getRequestLine().getPath(),request.getHeaders().get("Content-Type"))) {
                Map<String ,String > pathVariables = endpoint.getPathVariables(request.getRequestLine().getPath());
                 request.setPathVariables(pathVariables);
                 return endpoint;
             }
         }
         return null;
+    }
+    public boolean anyMatchesPath(String path) {
+        return endpoints.stream()
+                .anyMatch(ep -> ep.getInfo().pattern().matchesPath(path));
+    }
+    public boolean anyMatchedPathAndMethod(String path, HttpMethod method) {
+        return endpoints.stream()
+                .anyMatch(ep -> ep.getInfo().pattern().matchesPath(path) && ep.getInfo().method().equals(method));
     }
 
 
