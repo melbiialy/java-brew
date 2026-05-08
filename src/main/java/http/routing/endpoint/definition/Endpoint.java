@@ -18,10 +18,20 @@ public class Endpoint {
         this.parameters = parameters;
         this.responseDescriptor = responseDescriptor;
     }
-    public boolean matches(HttpMethod method, String path) {
+    public boolean matches(HttpMethod method, String path,String contentType) {
         return info.method().equals(method)
-                &&info.pattern().matchesPath(path);
+                &&info.pattern().matchesPath(path)&&matchContentType(contentType);
     }
+
+    private boolean matchContentType(String contentType) {
+        for (String s : info.consumes()) {
+            if (s.equals(contentType)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Map<String, String> getPathVariables(String path) {
         return info.pattern().match(path);
     }
@@ -88,4 +98,5 @@ public class Endpoint {
     public ResponseDescriptor getResponseDescriptor() {
         return responseDescriptor;
     }
+
 }
