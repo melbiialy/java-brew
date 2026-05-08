@@ -8,7 +8,7 @@ import http.response.HttpResponse;
 
 @Controller
 public class Test {
-    @EndPoint(path = "/test",method = HttpMethod.GET,consumes = "application/json",produces = "application/json")
+    @EndPoint(path = "/test",method = HttpMethod.GET)
     public void test(HttpResponse response) {
         response.setBody("Hello");
         response.getHeaders().put("Content-Type", ContentType.APPLICATION_JSON.toString());

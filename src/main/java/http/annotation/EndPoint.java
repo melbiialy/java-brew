@@ -24,6 +24,6 @@ import java.lang.annotation.*;
 public @interface EndPoint {
     String path() default "/";
     HttpMethod method() default HttpMethod.GET;
-    String  consumes();
-    String  produces();
+    ContentType  consumes() default ContentType.APPLICATION_JSON ;
+    ContentType  produces() default ContentType.APPLICATION_JSON;
 }

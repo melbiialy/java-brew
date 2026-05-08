@@ -68,8 +68,8 @@ public class EndpointScanner implements MethodScanner{
         HttpMethod httpMethod = endPoint.method();
         String path = endPoint.path();
         PathPattern pathPattern = new PathPattern(path);
-        String  consume = endPoint.consumes();
-        String  produces = endPoint.produces();
+        ContentType  consume = endPoint.consumes();
+        ContentType  produces = endPoint.produces();
         return new EndPointInfo(httpMethod, pathPattern, consume, produces);
     }
 

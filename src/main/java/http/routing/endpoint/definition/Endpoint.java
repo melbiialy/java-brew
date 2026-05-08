@@ -3,6 +3,7 @@ package http.routing.endpoint.definition;
 import http.enums.HttpMethod;
 import http.request.HttpRequest;
 import http.response.HttpResponse;
+import http.response.ResponseEntity;
 
 import java.util.Map;
 import java.util.UUID;
@@ -33,11 +34,10 @@ public class Endpoint {
         return info.pattern().match(path);
     }
 
-    public Object invoke(HttpRequest request, HttpResponse response, Map<String, String> pathVars)
+    public ResponseEntity<?> invoke(HttpRequest request, HttpResponse response, Map<String, String> pathVars)
             throws Exception {
         Object[] args = resolveArgs(request,response, pathVars);
-         handler.method().invoke(handler.bean(), args);
-         return null;
+        return (ResponseEntity<?>) handler.method().invoke(handler.bean(), args);
     }
 
     private Object[] resolveArgs(HttpRequest request,HttpResponse response, Map<String, String> pathVars) {
