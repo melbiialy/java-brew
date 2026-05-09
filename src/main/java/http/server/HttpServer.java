@@ -113,7 +113,10 @@ public final class HttpServer implements AutoCloseable {
             while ((request = requestReader.readRequest(socket)) != null) {
                 boolean close = "close".equalsIgnoreCase(request.getHeaders().get("Connection"));
                 handler.process(request, socket);
-                if (close) break;
+                if (close) {
+                    socket.close();
+                    break;
+                }
             }
         } catch (SocketException e) {
             LOGGER.debug("Client disconnected: {}", e.getMessage());
