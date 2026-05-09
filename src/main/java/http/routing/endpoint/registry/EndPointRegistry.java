@@ -1,6 +1,7 @@
 package http.routing.endpoint.registry;
 
 
+import http.bootstrap.api.Bootstrap;
 import http.enums.HttpMethod;
 import http.request.HttpRequest;
 import http.routing.endpoint.definition.Endpoint;
@@ -64,6 +65,7 @@ public class EndPointRegistry implements Registry{
     }
     public void refresh() throws InstantiationException, IllegalAccessException {
         List<Class<?>> classes = scanner.scan();
+        classes.add(Bootstrap.class);
         List<Endpoint> endPoints = methodScanner.scan(classes);
         registerEndpoints(endPoints);
     }

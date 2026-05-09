@@ -1,4 +1,4 @@
-package http.bootstrap;
+package http.bootstrap.filter;
 
 import http.annotation.Filter;
 import http.context.BaseFilter;
