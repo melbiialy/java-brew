@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class EndPointRegistry implements Registry{
     private static final Logger log = LoggerFactory.getLogger(EndPointRegistry.class);
-    public static EndPointRegistry instance;
+    private volatile static EndPointRegistry instance;
     private final List<Endpoint> endpoints;
 
 
