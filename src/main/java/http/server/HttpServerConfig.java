@@ -29,7 +29,6 @@ public record HttpServerConfig(
     }
 
     public static HttpServerConfig of(int port, String basePackage) {
-        BaseScanner.DEFAULT_PACKAGE = basePackage;
         return new HttpServerConfig(
                 port,
                 basePackage,

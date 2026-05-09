@@ -12,7 +12,7 @@ import java.util.List;
 
 public abstract class BaseScanner implements ClassPathScanner{
     private final Logger logger = LoggerFactory.getLogger(BaseScanner.class.getName());
-    public static  String DEFAULT_PACKAGE = "http";
+    public static  String DEFAULT_PACKAGE = "application";
 
     public abstract boolean matches(Class<?> clazz);
     @Override
