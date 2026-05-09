@@ -8,13 +8,13 @@ import http.exception.ResourceNotFoundException;
 import http.request.HttpRequest;
 import http.response.HttpResponse;
 import http.response.StatusLine;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.logging.Logger;
 
 @Filter
 public class BootstrapFilter implements BaseFilter {
-    Logger logger = (Logger) LoggerFactory.getLogger(BootstrapFilter.class);
+    Logger logger =  LoggerFactory.getLogger(BootstrapFilter.class);
     @Override
     public void doFilter(HttpRequest request, HttpResponse response, FilterChain chain) {
         logger.info("BootstrapFilter");

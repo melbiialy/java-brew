@@ -31,7 +31,6 @@ public class IterableFilterContext implements FilterContext {
                 .map(this::instantiate)
                 .map(BaseFilter.class::cast)
                 .forEach(this.baseFilters::add);
-        log.info("Filters: {}", baseFilters);
     }
 
     private boolean isFilter(Class<?> clazz) {
