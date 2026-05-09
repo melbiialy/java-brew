@@ -41,7 +41,7 @@ public final class HttpServer implements AutoCloseable {
     }
 
     public HttpServer(int port) {
-        this(HttpServerConfig.of(port, "example"));
+        this(HttpServerConfig.of(port, "application"));
     }
 
     public HttpServer(int port, String basePackage) {

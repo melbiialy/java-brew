@@ -1,7 +1,5 @@
 package http.server;
 
-import http.scanner.BaseScanner;
-
 import java.util.Objects;
 
 public record HttpServerConfig(
@@ -25,7 +23,7 @@ public record HttpServerConfig(
     }
 
     public static HttpServerConfig defaults() {
-        return of(8080, "example");
+        return of(8080, "application");
     }
 
     public static HttpServerConfig of(int port, String basePackage) {
