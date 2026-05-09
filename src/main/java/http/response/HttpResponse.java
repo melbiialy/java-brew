@@ -9,7 +9,8 @@ public class HttpResponse {
     private String body;
 
     public HttpResponse() {
-        headers = new HashMap<>();
+        this.statusLine = new StatusLine("HTTP/1.1", 200, "OK");
+        this.headers = new HashMap<>();
     }
     public HttpResponse(StatusLine statusLine, HashMap<String, String> headers, String body) {
         this.statusLine = statusLine;
