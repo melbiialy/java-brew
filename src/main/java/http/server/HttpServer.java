@@ -138,7 +138,6 @@ public final class HttpServer implements AutoCloseable {
         } catch (IOException e) {
             LOGGER.warn("Error closing server socket: {}", e.getMessage());
         }
-        executor.shutdown();
         try {
             if (!executor.awaitTermination(config.shutdownTimeoutSeconds(), TimeUnit.SECONDS)) {
                 executor.shutdownNow();
