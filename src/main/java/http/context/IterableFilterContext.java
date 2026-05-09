@@ -10,9 +10,12 @@ import java.util.List;
 
 public class IterableFilterContext implements FilterContext {
     private static final Logger log = LoggerFactory.getLogger(IterableFilterContext.class);
+    private static IterableFilterContext instance;
+
     List<BaseFilter> baseFilters = new ArrayList<>();
-   public ThreadLocal<Integer> filterIndex = ThreadLocal.withInitial(() -> 0);
+    public ThreadLocal<Integer> filterIndex = ThreadLocal.withInitial(() -> 0);
     ClassPathScanner scanner;
+
     public IterableFilterContext(ClassPathScanner scanner){
         this.scanner = scanner;
         baseFilters.add(new BootstrapFilter());
@@ -63,4 +66,5 @@ public class IterableFilterContext implements FilterContext {
     public void set() {
         filterIndex.set(0);
     }
+
 }

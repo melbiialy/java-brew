@@ -56,8 +56,8 @@ public final class HttpServer implements AutoCloseable {
 
         this.executor = Executors.newFixedThreadPool(config.workerThreads());
 
-        filterContext = new IterableFilterContext(FilterScanner.getInstance());
-        endpointRegistry = new EndPointRegistry(EndpointScanner.getInstance(),ControllerScanner.getInstance());
+        filterContext = new IterableFilterContext(new FilterScanner());
+        endpointRegistry = new EndPointRegistry(new EndpointScanner(),new ControllerScanner());
         Router router = new Router(endpointRegistry);
         this.handler = new HttpHandler(
                 new DefaultFilterChain(

@@ -18,17 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EndpointScanner implements MethodScanner{
-    private static  EndpointScanner instance;
-    public static EndpointScanner getInstance() {
-        if (instance == null) {
-            synchronized (EndpointScanner.class) {
-                if (instance == null) {
-                    instance = new EndpointScanner();
-                }
-            }
-        }
-        return instance;
-    }
+
 
     @Override
     public List<Endpoint> scan(List<Class<?>> classes) throws InstantiationException, IllegalAccessException {
