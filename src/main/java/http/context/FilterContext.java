@@ -6,8 +6,8 @@ public interface FilterContext {
 
      List<BaseFilter> getFilters();
 
-     void setFilters(List<Class<?>> baseFilters);
-     void setFilters();
+     void refresh(List<Class<?>> baseFilters);
+     void refresh();
 
      BaseFilter getNextFilter();
 

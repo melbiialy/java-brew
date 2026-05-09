@@ -18,13 +18,13 @@ public class Router {
     private static final Logger log = LoggerFactory.getLogger(Router.class);
     private final Registry registry;
 
-    public Router() {
-        this.registry = EndPointRegistry.getInstance();
+    public Router(Registry registry) {
+        this.registry = registry;
     }
 
 
     public Endpoint route(HttpRequest httpRequest)  {
-        log.info("Routing request: {}", httpRequest);
+        log.trace("Routing request: {}", httpRequest);
         Endpoint matchedEndpoint = registry.getEndPoint(httpRequest);
         if (matchedEndpoint != null) {
             return matchedEndpoint;

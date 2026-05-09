@@ -12,4 +12,5 @@ public interface Registry {
     Endpoint getEndPoint(HttpRequest request);
     boolean anyMatchesPath(String path);
     boolean anyMatchedPathAndMethod(String path, HttpMethod method);
+    void refresh() throws InstantiationException, IllegalAccessException;
 }

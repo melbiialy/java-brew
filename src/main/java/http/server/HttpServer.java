@@ -7,6 +7,8 @@ import http.request.HttpRequest;
 import http.request.RequestReader;
 import http.response.ResponseWriter;
 import http.routing.Router;
+import http.routing.endpoint.registry.EndPointRegistry;
+import http.routing.endpoint.registry.Registry;
 import http.scanner.ControllerScanner;
 import http.scanner.EndpointScanner;
 import http.scanner.FilterScanner;
@@ -35,6 +37,7 @@ public final class HttpServer implements AutoCloseable {
     private volatile boolean running;
     private final HttpHandler handler;
     private final FilterContext filterContext ;
+    private final Registry endpointRegistry;
 
     public HttpServer() {
         this(HttpServerConfig.defaults());
@@ -54,7 +57,8 @@ public final class HttpServer implements AutoCloseable {
         this.executor = Executors.newFixedThreadPool(config.workerThreads());
 
         filterContext = new IterableFilterContext(FilterScanner.getInstance());
-        Router router = new Router();
+        endpointRegistry = new EndPointRegistry(EndpointScanner.getInstance(),ControllerScanner.getInstance());
+        Router router = new Router(endpointRegistry);
         this.handler = new HttpHandler(
                 new DefaultFilterChain(
                     filterContext,
@@ -80,8 +84,8 @@ public final class HttpServer implements AutoCloseable {
 
     public synchronized void refresh() {
         try {
-            new EndpointScanner().scan(new ControllerScanner().scan(config.basePackage()));
-            filterContext.setFilters();
+            endpointRegistry.refresh();
+            filterContext.refresh();
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException("Failed to register endpoints", e);
         }

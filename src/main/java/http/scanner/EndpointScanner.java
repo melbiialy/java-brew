@@ -14,23 +14,37 @@ import http.routing.endpoint.registry.Registry;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EndpointScanner implements MethodScanner{
-    @Override
-    public void scan(List<Class<?>> classes) throws InstantiationException, IllegalAccessException {
-        Registry registry = EndPointRegistry.getInstance();
-        for (Class<?> clazz : classes) {
-            registerEndPoints(clazz,registry);
+    private static  EndpointScanner instance;
+    public static EndpointScanner getInstance() {
+        if (instance == null) {
+            synchronized (EndpointScanner.class) {
+                if (instance == null) {
+                    instance = new EndpointScanner();
+                }
+            }
         }
+        return instance;
     }
 
-    private void registerEndPoints(Class<?> clazz,Registry registry) throws InstantiationException, IllegalAccessException {
+    @Override
+    public List<Endpoint> scan(List<Class<?>> classes) throws InstantiationException, IllegalAccessException {
+        List<Endpoint> endpoints = new ArrayList<>();
+        for (Class<?> clazz : classes) {
+            registerEndPoints(clazz,endpoints);
+        }
+        return endpoints;
+    }
+
+    private void registerEndPoints(Class<?> clazz,List<Endpoint> endpoints) throws InstantiationException, IllegalAccessException {
         Method[] methods = clazz.getMethods();
         for(Method method : methods){
             if (method.isAnnotationPresent(EndPoint.class)) {
                 Endpoint endpoint = getEndpoint(method,clazz);
-                registry.register(endpoint);
+                endpoints.add(endpoint);
             }
         }
     }

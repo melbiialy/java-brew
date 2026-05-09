@@ -21,11 +21,11 @@ public class IterableFilterContext implements FilterContext {
     public List<BaseFilter> getFilters() {
         return baseFilters;
     }
-    public void setFilters(){
-        setFilters(scanner.scan());
+    public void refresh(){
+        refresh(scanner.scan());
     }
 
-    public void setFilters(List<Class<?>> filters) {
+    public void refresh(List<Class<?>> filters) {
         filters.stream()
                 .filter(this::isFilter)
                 .map(this::instantiate)
@@ -51,7 +51,6 @@ public class IterableFilterContext implements FilterContext {
     }
 
     public BaseFilter getNextFilter() {
-        log.info("Filter index: {}", baseFilters.size());
         if (filterIndex.get() == baseFilters.size()) {
             return null;
         }

@@ -17,7 +17,7 @@ public class BootstrapFilter implements BaseFilter {
     Logger logger =  LoggerFactory.getLogger(BootstrapFilter.class);
     @Override
     public void doFilter(HttpRequest request, HttpResponse response, FilterChain chain) {
-        logger.info("BootstrapFilter");
+        logger.trace("BootstrapFilter");
 
         if (request.getHeaders() != null) {
             String encoding = request.getHeaders().get("Accept-Encoding");
