@@ -7,8 +7,6 @@ import http.request.HttpRequest;
 import http.request.RequestReader;
 import http.response.ResponseWriter;
 import http.routing.Router;
-import http.routing.endpoint.registry.EndPointRegistry;
-import http.scanner.ClassPathScanner;
 import http.scanner.ControllerScanner;
 import http.scanner.EndpointScanner;
 import http.scanner.FilterScanner;
@@ -85,8 +83,6 @@ public final class HttpServer implements AutoCloseable {
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException("Failed to register endpoints", e);
         }
-        filterContext.setFilters();
-;
         LOGGER.info("Refreshed controllers and filters from package: {}", config.basePackage());
     }
 
