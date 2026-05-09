@@ -1,5 +1,6 @@
 package http.scanner;
 
+import http.annotation.Controller;
 import http.annotation.EndPoint;
 import http.annotation.PathVariable;
 import http.enums.ContentType;
@@ -35,8 +36,9 @@ public class EndpointScanner implements MethodScanner{
     }
 
     private Endpoint getEndpoint(Method method, Class<?> clazz) throws InstantiationException, IllegalAccessException {
+        String prefix = clazz.getAnnotation(Controller.class).path();
         EndPoint endPoint = method.getAnnotation(EndPoint.class);
-        EndPointInfo info = getEndPointInfo(endPoint);
+        EndPointInfo info = getEndPointInfo(endPoint,prefix);
         HandlerMethod handlerMethod = getHandlerMethod(method, clazz);
         Parameter[] parameters = method.getParameters();
         ParameterDescriptor[] parameterDescriptors = new ParameterDescriptor[parameters.length];
@@ -64,9 +66,9 @@ public class EndpointScanner implements MethodScanner{
         return new HandlerMethod(clazz.newInstance(), method);
     }
 
-    private static EndPointInfo getEndPointInfo(EndPoint endPoint) {
+    private static EndPointInfo getEndPointInfo(EndPoint endPoint, String prefix) {
         HttpMethod httpMethod = endPoint.method();
-        String path = endPoint.path();
+        String path = prefix+endPoint.path();
         PathPattern pathPattern = new PathPattern(path);
         ContentType  consume = endPoint.consumes();
         ContentType  produces = endPoint.produces();

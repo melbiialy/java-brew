@@ -51,7 +51,8 @@ public final class HttpServer implements AutoCloseable {
     public HttpServer(HttpServerConfig config) {
         this.config = Objects.requireNonNull(config, "config");
 
-        this.executor = Executors.newFixedThreadPool(config.workerThreads()); // to do migrate to vritual threads
+        this.executor = Executors.newFixedThreadPool(config.workerThreads());
+
         filterContext = new IterableFilterContext(FilterScanner.getInstance());
         Router router = new Router();
         this.handler = new HttpHandler(
