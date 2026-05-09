@@ -1,5 +1,6 @@
 package http.context;
 
+import http.bootstrap.BootstrapFilter;
 import http.scanner.ClassPathScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ public class IterableFilterContext implements FilterContext {
     ClassPathScanner scanner;
     public IterableFilterContext(ClassPathScanner scanner){
         this.scanner = scanner;
+        baseFilters.add(new BootstrapFilter());
     }
 
     public List<BaseFilter> getFilters() {
