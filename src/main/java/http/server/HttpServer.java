@@ -50,15 +50,16 @@ public final class HttpServer implements AutoCloseable {
 
     public HttpServer(HttpServerConfig config) {
         this.config = Objects.requireNonNull(config, "config");
-        this.executor = Executors.newFixedThreadPool(config.workerThreads());
+
+        this.executor = Executors.newFixedThreadPool(config.workerThreads()); // to do migrate to vritual threads
         filterContext = new IterableFilterContext(FilterScanner.getInstance());
         Router router = new Router();
         this.handler = new HttpHandler(
                 new DefaultFilterChain(
-                        filterContext,
+                    filterContext,
                         new HttpFinalHandler(router)),
-                new ResponseWriter());
-    }
+            new ResponseWriter());
+}
 
     public void start() throws IOException {
         if (running) {
@@ -118,9 +119,7 @@ public final class HttpServer implements AutoCloseable {
         }
     }
 
-    public void stop() {
-        close();
-    }
+
 
     @Override
     public synchronized void close() {

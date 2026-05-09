@@ -19,7 +19,7 @@ public abstract class BaseScanner implements ClassPathScanner{
     public List<Class<?>> scan(String basePackage) {
         String packagePath = basePackage.replace('.', '/');
         List<Class<?>> classes = new ArrayList<>();
-        logger.info("Scanning package: {}", basePackage);
+        logger.debug("Scanning package: {}", basePackage);
 
         try {
             File[] files = getFiles(packagePath);
