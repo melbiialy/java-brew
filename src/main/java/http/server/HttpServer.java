@@ -30,12 +30,11 @@ public final class HttpServer implements AutoCloseable {
     private final HttpServerConfig config;
     private final ExecutorService executor;
     private final RequestReader requestReader = new RequestReader();
-    private final Router router = new Router();
 
     private volatile ServerSocket serverSocket;
     private volatile boolean running;
-    private HttpHandler handler;
-    private FilterContext filterContext ;
+    private final HttpHandler handler;
+    private final FilterContext filterContext ;
 
     public HttpServer() {
         this(HttpServerConfig.defaults());
@@ -52,7 +51,8 @@ public final class HttpServer implements AutoCloseable {
     public HttpServer(HttpServerConfig config) {
         this.config = Objects.requireNonNull(config, "config");
         this.executor = Executors.newFixedThreadPool(config.workerThreads());
-        filterContext = new IterableFilterContext(new FilterScanner());
+        filterContext = new IterableFilterContext(FilterScanner.getInstance());
+        Router router = new Router();
         this.handler = new HttpHandler(
                 new DefaultFilterChain(
                         filterContext,
