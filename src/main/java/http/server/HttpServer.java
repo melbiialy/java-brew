@@ -1,6 +1,6 @@
 package http.server;
+
 import http.context.DefaultFilterChain;
-import http.context.FilterChain;
 import http.context.FilterContext;
 import http.context.IterableFilterContext;
 import http.request.HttpRequest;
@@ -8,8 +8,10 @@ import http.request.RequestReader;
 import http.response.ResponseWriter;
 import http.routing.Router;
 import http.routing.endpoint.registry.EndPointRegistry;
-import http.routing.endpoint.registry.Registry;
-import http.scanner.*;
+import http.scanner.ClassPathScanner;
+import http.scanner.ControllerScanner;
+import http.scanner.EndpointScanner;
+import http.scanner.FilterScanner;
 import http.utils.Banner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,75 +20,86 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
+public final class HttpServer implements AutoCloseable {
 
-public class HttpServer {
-    private final ClassPathScanner controllerScanner;
-    private final ClassPathScanner filterScanner;
-    private final MethodScanner methodScanner;
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServer.class);
+
+    private final HttpServerConfig config;
     private final ExecutorService executor;
-    private final Router router;
-    private final ServerSocket serverSocket;
-    private final RequestReader requestReader;
-    private final HttpHandler httpHandler;
-    private final String basePackage;
-    private volatile boolean running;                  // ← volatile for thread visibility
-    private final Logger logger = LoggerFactory.getLogger(HttpServer.class);
+    private final RequestReader requestReader = new RequestReader();
+    private final Router router = new Router();
 
-    public HttpServer(int port, String basePackage) throws IOException {
-        this.basePackage = basePackage;
-        this.serverSocket = new ServerSocket(port);
-        this.router = new Router();
-        this.requestReader = new RequestReader();
-        this.running = true;
+    private volatile ServerSocket serverSocket;
+    private volatile boolean running;
+    private HttpHandler handler;
+    private FilterContext filterContext ;
 
-        // scan filters eagerly at construction time
-        filterScanner = new FilterScanner();
-        FilterChain filterChain = new DefaultFilterChain(
-                new IterableFilterContext(filterScanner),
-                new HttpFinalHandler(router)
-        );
-
-        this.httpHandler = new HttpHandler(filterChain, new ResponseWriter());
-        this.executor = Executors.newFixedThreadPool(
-                Runtime.getRuntime().availableProcessors() * 2  // ← bounded
-        );
-        this.controllerScanner = new ControllerScanner();
-        this.methodScanner = new EndpointScanner();
-        EndPointRegistry.getInstance();
+    public HttpServer() {
+        this(HttpServerConfig.defaults());
     }
 
-    public HttpServer(int port) throws IOException {
-        this(port, "example");
+    public HttpServer(int port) {
+        this(HttpServerConfig.of(port, "example"));
     }
 
-    public HttpServer() throws IOException {
-        this(8080);
+    public HttpServer(int port, String basePackage) {
+        this(HttpServerConfig.of(port, basePackage));
     }
 
-    public void start() throws Exception {
+    public HttpServer(HttpServerConfig config) {
+        this.config = Objects.requireNonNull(config, "config");
+        this.executor = Executors.newFixedThreadPool(config.workerThreads());
+        filterContext = new IterableFilterContext(new FilterScanner());
+        this.handler = new HttpHandler(
+                new DefaultFilterChain(
+                        filterContext,
+                        new HttpFinalHandler(router)),
+                new ResponseWriter());
+    }
+
+    public void start() throws IOException {
+        if (running) {
+            throw new IllegalStateException("Server is already running");
+        }
+
+
         new Banner().print();
-        List<Class<?>> controllers = controllerScanner.scan(basePackage);
-        methodScanner.scan(controllers);
-        logger.info("Server started on port: {}", serverSocket.getLocalPort());
-        acceptConnections();
+        refresh();
+
+        this.serverSocket = new ServerSocket(config.port());
+        this.running = true;
+        LOGGER.info("Server started on port: {}", serverSocket.getLocalPort());
+
+        acceptLoop();
     }
 
-    private void acceptConnections() throws IOException {
-        while (this.running) {
+    public synchronized void refresh() {
+        try {
+            new EndpointScanner().scan(new ControllerScanner().scan(config.basePackage()));
+            filterContext.setFilters();
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Failed to register endpoints", e);
+        }
+        filterContext.setFilters();
+;
+        LOGGER.info("Refreshed controllers and filters from package: {}", config.basePackage());
+    }
+
+    private void acceptLoop() throws IOException {
+        while (running) {
             try {
                 Socket socket = serverSocket.accept();
                 socket.setTcpNoDelay(true);
-                socket.setSoTimeout(0);
                 socket.setKeepAlive(true);
-                logger.info("Accepted connection from: {}", socket.getInetAddress());
+                LOGGER.info("Accepted connection from: {}", socket.getInetAddress());
                 executor.execute(() -> handleConnection(socket));
             } catch (SocketException e) {
-                if (!running) break; // ← expected during shutdown
+                if (!running) return;
                 throw e;
             }
         }
@@ -94,27 +107,43 @@ public class HttpServer {
 
     private void handleConnection(Socket socket) {
         try (socket) {
-            HttpRequest httpRequest;
-            while ((httpRequest = requestReader.readRequest(socket)) != null) {
-                boolean closeConnection = "close".equalsIgnoreCase(
-                        httpRequest.getHeaders().get("Connection")
-                );
-                httpHandler.process(httpRequest, socket);
-                if (closeConnection) break;
+            HttpRequest request;
+            while ((request = requestReader.readRequest(socket)) != null) {
+                boolean close = "close".equalsIgnoreCase(request.getHeaders().get("Connection"));
+                handler.process(request, socket);
+                if (close) break;
             }
         } catch (SocketException e) {
-            logger.debug("Client disconnected: {}", e.getMessage());
+            LOGGER.debug("Client disconnected: {}", e.getMessage());
         } catch (IOException e) {
-            logger.warn("I/O error on connection: {}", e.getMessage());
+            LOGGER.warn("I/O error on connection: {}", e.getMessage());
         } catch (Exception e) {
-            logger.error("Unexpected error on connection", e);
+            LOGGER.error("Unexpected error on connection", e);
         }
     }
 
-    public void stop() throws IOException {
-        this.running = false;
-        serverSocket.close();        // ← unblocks accept()
+    public void stop() {
+        close();
+    }
+
+    @Override
+    public synchronized void close() {
+        if (!running && serverSocket == null) return;
+        running = false;
+        try {
+            if (serverSocket != null) serverSocket.close();
+        } catch (IOException e) {
+            LOGGER.warn("Error closing server socket: {}", e.getMessage());
+        }
         executor.shutdown();
-        logger.info("Server stopped.");
+        try {
+            if (!executor.awaitTermination(config.shutdownTimeoutSeconds(), TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+        LOGGER.info("Server stopped.");
     }
 }

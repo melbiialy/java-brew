@@ -14,11 +14,13 @@ public class IterableFilterContext implements FilterContext {
     ClassPathScanner scanner;
     public IterableFilterContext(ClassPathScanner scanner){
         this.scanner = scanner;
-        setFilters(scanner.scan("example"));
     }
 
     public List<BaseFilter> getFilters() {
         return baseFilters;
+    }
+    public void setFilters(){
+        setFilters(scanner.scan());
     }
 
     public void setFilters(List<Class<?>> filters) {
